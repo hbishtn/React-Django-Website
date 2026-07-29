@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';   // naya import
 
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { login } = useAuth();
+  const { clearCart } = useCart(); 
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
@@ -21,6 +23,7 @@ function Login() {
       .then((response) => response.json())
       .then((data) => {
         if (data.token) {
+          clearCart(); 
           login(data.token, data.username);
           navigate('/');
         } else {

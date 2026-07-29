@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Category, Product, ProductImage
+from .models import Category, Product, ProductImage, Order, OrderItem, Cart, CartItem
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -40,3 +40,46 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
+
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    product_name = serializers.CharField(source='product.name', read_only=True)
+
+    class Meta:
+        model = OrderItem
+        fields = ['product', 'product_name', 'quantity', 'price']
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    items = OrderItemSerializer(many=True)
+
+    class Meta:
+        model = Order
+        fields = ['id', 'full_name', 'address', 'phone', 'total_price', 'status', 'items', 'created_at']
+        read_only_fields = ['status', 'created_at']
+
+    def create(self, validated_data):
+        items_data = validated_data.pop('items')
+        user = self.context['request'].user
+        order = Order.objects.create(user=user, **validated_data)
+
+        for item_data in items_data:
+            OrderItem.objects.create(order=order, **item_data)
+
+        return order
+
+
+class CartItemSerializer(serializers.ModelSerializer):
+    product_detail = ProductSerializer(source='product', read_only=True)
+
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product', 'product_detail', 'quantity']
+
+
+class CartSerializer(serializers.ModelSerializer):
+    items = CartItemSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Cart
+        fields = ['id', 'items']

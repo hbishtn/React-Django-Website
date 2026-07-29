@@ -1,11 +1,15 @@
 import { Link } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 
 function Navbar() {
   const { cartItems } = useCart();
   const { username, logout } = useAuth();
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <nav className="bg-pink-500 text-white px-6 py-4 flex justify-between items-center">
@@ -26,7 +30,7 @@ function Navbar() {
         {username ? (
           <div className="flex items-center gap-3">
             <span>Hi, {username}</span>
-            <button onClick={logout} className="hover:underline">
+            <button onClick={handleLogout} className="hover:underline">
               Logout
             </button>
           </div>

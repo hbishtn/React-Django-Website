@@ -1,32 +1,66 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
+  const { token } = useAuth();
 
-  const addToCart = (product) => {
-    setCartItems((prevItems) => {
-      const existingItem = prevItems.find((item) => item.id === product.id);
+  const fetchCart = () => {
+    if (!token) {
+      setCartItems([]);
+      return;
+    }
 
-      if (existingItem) {
-        return prevItems.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      } else {
-        return [...prevItems, { ...product, quantity: 1 }];
-      }
-    });
+    fetch('http://127.0.0.1:8000/api/cart/', {
+      headers: { Authorization: `Token ${token}` },
+    })
+      .then((response) => response.json())
+      .then((data) => setCartItems(data.items || []));
   };
 
-  const removeFromCart = (productId) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== productId));
+  useEffect(() => {
+    fetchCart();
+  }, [token]);
+
+  const addToCart = (product) => {
+    fetch('http://127.0.0.1:8000/api/cart/add/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Token ${token}`,
+      },
+      body: JSON.stringify({ product_id: product.id }),
+    })
+      .then((response) => response.json())
+      .then((data) => setCartItems(data.items || []));
+  };
+
+  const removeFromCart = (itemId) => {
+    fetch(`http://127.0.0.1:8000/api/cart/remove/${itemId}/`, {
+      method: 'DELETE',
+      headers: { Authorization: `Token ${token}` },
+    })
+      .then((response) => response.json())
+      .then((data) => setCartItems(data.items || []));
+  };
+
+  const clearCart = () => {
+    if (!token) {
+      setCartItems([]);
+      return;
+    }
+    fetch('http://127.0.0.1:8000/api/cart/clear/', {
+      method: 'DELETE',
+      headers: { Authorization: `Token ${token}` },
+    })
+      .then((response) => response.json())
+      .then((data) => setCartItems(data.items || []));
   };
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart }}>
+    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, clearCart, fetchCart }}>
       {children}
     </CartContext.Provider>
   );

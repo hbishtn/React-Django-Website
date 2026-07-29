@@ -5,7 +5,7 @@ function Cart() {
   const { cartItems, removeFromCart } = useCart();
 
   const totalPrice = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) => sum + item.product_detail.price * item.quantity,
     0
   );
 
@@ -26,7 +26,8 @@ function Cart() {
 
       <div className="max-w-2xl mx-auto space-y-4">
         {cartItems.map((item) => {
-          const primaryImage = item.images.find((img) => img.is_primary) || item.images[0];
+          const product = item.product_detail;
+          const primaryImage = product.images.find((img) => img.is_primary) || product.images[0];
 
           return (
             <div
@@ -36,13 +37,13 @@ function Cart() {
               {primaryImage && (
                 <img
                   src={primaryImage.image}
-                  alt={item.name}
+                  alt={product.name}
                   className="w-20 h-20 object-cover rounded-lg"
                 />
               )}
               <div className="flex-1">
-                <h3 className="font-semibold text-gray-800">{item.name}</h3>
-                <p className="text-pink-600 font-bold">₹{item.price}</p>
+                <h3 className="font-semibold text-gray-800">{product.name}</h3>
+                <p className="text-pink-600 font-bold">₹{product.price}</p>
                 <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
               </div>
               <button
@@ -60,6 +61,13 @@ function Cart() {
         <span className="text-lg font-semibold text-gray-800">Total</span>
         <span className="text-xl font-bold text-pink-600">₹{totalPrice.toFixed(2)}</span>
       </div>
+
+      <Link
+        to="/checkout"
+        className="max-w-2xl mx-auto mt-4 block text-center bg-pink-500 text-white py-3 rounded-full hover:bg-pink-600 transition-colors"
+      >
+        Proceed to Checkout
+      </Link>
     </div>
   );
 }
