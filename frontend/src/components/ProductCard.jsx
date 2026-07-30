@@ -5,7 +5,7 @@ function ProductCard({ product }) {
 
   return (
     <Link to={`/products/${product.id}`}>
-      <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-md hover:shadow-xl border border-transparent hover:border-sky-200 transition-all duration-300 overflow-hidden">
         {primaryImage && (
           <img
             src={primaryImage.image}
@@ -15,7 +15,7 @@ function ProductCard({ product }) {
         )}
         <div className="p-4">
           <h3 className="text-lg font-semibold text-gray-800">{product.name}</h3>
-          <p className="text-pink-600 font-bold mt-1">₹{product.price}</p>
+          <p className="text-orange-600 font-bold mt-1">₹{product.price}</p>
         </div>
       </div>
     </Link>

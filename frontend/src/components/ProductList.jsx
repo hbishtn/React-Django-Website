@@ -21,12 +21,15 @@ function ProductList() {
     : products;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-
-      <div className="flex justify-center gap-3 mb-8 flex-wrap">
+    <div className="min-h-screen bg-gray-100 p-6">
+      <div className="flex justify-center gap-3 mb-10 flex-wrap">
         <button
           onClick={() => setSelectedCategory(null)}
-          className="px-4 py-2 rounded-full bg-pink-500 text-white hover:bg-pink-600 transition-colors"
+          className={`px-5 py-2 rounded-full font-medium border-2 transition-all ${
+            selectedCategory === null
+              ? 'bg-orange-600 text-white border-orange-600 shadow-md'
+              : 'bg-white text-gray-700 border-sky-200 hover:border-sky-400'
+          }`}
         >
           All
         </button>
@@ -34,7 +37,11 @@ function ProductList() {
           <button
             key={category.id}
             onClick={() => setSelectedCategory(category.id)}
-            className="px-4 py-2 rounded-full bg-white border border-pink-300 text-pink-600 hover:bg-pink-50 transition-colors"
+            className={`px-5 py-2 rounded-full font-medium border-2 transition-all ${
+              selectedCategory === category.id
+                ? 'bg-orange-600 text-white border-orange-600 shadow-md'
+                : 'bg-white text-gray-700 border-sky-200 hover:border-sky-400'
+            }`}
           >
             {category.name}
           </button>

@@ -14,7 +14,7 @@ function Checkout() {
   const [error, setError] = useState('');
 
   const totalPrice = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) => sum + item.product_detail.price * item.quantity,
     0
   );
 
@@ -28,9 +28,9 @@ function Checkout() {
       phone: phone,
       total_price: totalPrice.toFixed(2),
       items: cartItems.map((item) => ({
-        product: item.id,
+        product: item.product_detail.id,
         quantity: item.quantity,
-        price: item.price,
+        price: item.product_detail.price,
       })),
     };
 
