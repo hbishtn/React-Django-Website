@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import ProductCard from './ProductCard';
 
 function ProductList() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get('search') || '';
 
   useEffect(() => {
     fetch('http://127.0.0.1:8000/api/products/')
@@ -16,19 +19,31 @@ function ProductList() {
       .then((data) => setCategories(data));
   }, []);
 
-  const filteredProducts = selectedCategory
+  let filteredProducts = selectedCategory
     ? products.filter((product) => product.category === selectedCategory)
     : products;
 
+  if (searchQuery) {
+    filteredProducts = filteredProducts.filter((product) =>
+      product.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-[#F5F5F6] p-6">
+      {searchQuery && (
+        <p className="text-center text-[#7E818C] mb-4">
+          Showing results for "<span className="font-semibold text-[#282C3F]">{searchQuery}</span>"
+        </p>
+      )}
+
       <div className="flex justify-center gap-3 mb-10 flex-wrap">
         <button
           onClick={() => setSelectedCategory(null)}
-          className={`px-5 py-2 rounded-full font-medium border-2 transition-all ${
+          className={`px-5 py-2 rounded-full text-sm font-semibold border transition-all ${
             selectedCategory === null
-              ? 'bg-orange-600 text-white border-orange-600 shadow-md'
-              : 'bg-white text-gray-700 border-sky-200 hover:border-sky-400'
+              ? 'bg-[#FF3F6C] text-white border-[#FF3F6C]'
+              : 'bg-white text-[#282C3F] border-gray-200 hover:border-[#FF3F6C]'
           }`}
         >
           All
@@ -37,10 +52,10 @@ function ProductList() {
           <button
             key={category.id}
             onClick={() => setSelectedCategory(category.id)}
-            className={`px-5 py-2 rounded-full font-medium border-2 transition-all ${
+            className={`px-5 py-2 rounded-full text-sm font-semibold border transition-all ${
               selectedCategory === category.id
-                ? 'bg-orange-600 text-white border-orange-600 shadow-md'
-                : 'bg-white text-gray-700 border-sky-200 hover:border-sky-400'
+                ? 'bg-[#FF3F6C] text-white border-[#FF3F6C]'
+                : 'bg-white text-[#282C3F] border-gray-200 hover:border-[#FF3F6C]'
             }`}
           >
             {category.name}
@@ -48,11 +63,15 @@ function ProductList() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-        {filteredProducts.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+      {filteredProducts.length === 0 ? (
+        <p className="text-center text-gray-500 mt-10">No products found.</p>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 max-w-7xl mx-auto">
+          {filteredProducts.map((product, index) => (
+            <ProductCard key={product.id} product={product} index={index} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
