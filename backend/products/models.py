@@ -4,7 +4,8 @@ from django.contrib.auth.models import User
 class Category(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
-
+    image = models.ImageField(upload_to='categories/', blank=True, null=True)
+    
     class Meta:
         verbose_name_plural = "Categories"
 
@@ -82,3 +83,4 @@ class CartItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity} x {self.product.name}"
+

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ProductCard from './ProductCard';
+import CategoryTiles from './CategoryTiles';
+import { useLanguage } from '../context/LanguageContext';
 
 function ProductList() {
   const [products, setProducts] = useState([]);
@@ -8,6 +10,7 @@ function ProductList() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('search') || '';
+  const { t } = useLanguage();
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/products/`)
@@ -37,31 +40,12 @@ function ProductList() {
         </p>
       )}
 
-      <div className="flex justify-center gap-3 mb-10 flex-wrap">
-        <button
-          onClick={() => setSelectedCategory(null)}
-          className={`px-5 py-2 rounded-full text-sm font-semibold border transition-all ${
-            selectedCategory === null
-              ? 'bg-[#FF3F6C] text-white border-[#FF3F6C]'
-              : 'bg-white text-[#282C3F] border-gray-200 hover:border-[#FF3F6C]'
-          }`}
-        >
-          All
-        </button>
-        {categories.map((category) => (
-          <button
-            key={category.id}
-            onClick={() => setSelectedCategory(category.id)}
-            className={`px-5 py-2 rounded-full text-sm font-semibold border transition-all ${
-              selectedCategory === category.id
-                ? 'bg-[#FF3F6C] text-white border-[#FF3F6C]'
-                : 'bg-white text-[#282C3F] border-gray-200 hover:border-[#FF3F6C]'
-            }`}
-          >
-            {category.name}
-          </button>
-        ))}
-      </div>
+      <CategoryTiles
+        categories={categories}
+        selectedCategory={selectedCategory}
+        onSelect={setSelectedCategory}
+        t={t}
+      />
 
       {filteredProducts.length === 0 ? (
         <p className="text-center text-gray-500 mt-10">No products found.</p>
