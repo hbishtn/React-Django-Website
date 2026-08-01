@@ -153,7 +153,3 @@ REST_FRAMEWORK = {
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    # Vercel wala URL yaha baad mein add karenge
-]
