@@ -10,11 +10,11 @@ function ProductList() {
   const searchQuery = searchParams.get('search') || '';
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/products/')
+    fetch(`${import.meta.env.VITE_API_URL}/products/`)
       .then((response) => response.json())
       .then((data) => setProducts(data));
 
-    fetch('http://127.0.0.1:8000/api/categories/')
+    fetch(`${import.meta.env.VITE_API_URL}/categories/`)
       .then((response) => response.json())
       .then((data) => setCategories(data));
   }, []);

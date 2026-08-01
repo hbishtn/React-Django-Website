@@ -8,7 +8,7 @@ function ProductDetail() {
   const { addToCart } = useCart();
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/api/products/${id}/`)
+    fetch(`${import.meta.env.VITE_API_URL}/products/${id}/`)
       .then((response) => response.json())
       .then((data) => setProduct(data));
   }, [id]);

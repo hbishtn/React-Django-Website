@@ -13,7 +13,7 @@ export function CartProvider({ children }) {
       return;
     }
 
-    fetch('http://127.0.0.1:8000/api/cart/', {
+    fetch(`${import.meta.env.VITE_API_URL}/cart/`, {
       headers: { Authorization: `Token ${token}` },
     })
       .then((response) => response.json())
@@ -25,7 +25,7 @@ export function CartProvider({ children }) {
   }, [token]);
 
   const addToCart = (product) => {
-    fetch('http://127.0.0.1:8000/api/cart/add/', {
+    fetch(`${import.meta.env.VITE_API_URL}/cart/add/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -38,7 +38,7 @@ export function CartProvider({ children }) {
   };
 
   const removeFromCart = (itemId) => {
-    fetch(`http://127.0.0.1:8000/api/cart/remove/${itemId}/`, {
+    fetch(`${import.meta.env.VITE_API_URL}/cart/remove/${itemId}/`, {
       method: 'DELETE',
       headers: { Authorization: `Token ${token}` },
     })
@@ -51,7 +51,7 @@ export function CartProvider({ children }) {
       setCartItems([]);
       return;
     }
-    fetch('http://127.0.0.1:8000/api/cart/clear/', {
+    fetch(`${import.meta.env.VITE_API_URL}/cart/clear/`, {
       method: 'DELETE',
       headers: { Authorization: `Token ${token}` },
     })

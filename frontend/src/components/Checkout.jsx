@@ -34,7 +34,7 @@ function Checkout() {
       })),
     };
 
-    fetch('http://127.0.0.1:8000/api/orders/', {
+    fetch(`${import.meta.env.VITE_API_URL}/orders/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
