@@ -10,6 +10,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import ChatWidget from './components/ChatWidget';
 import Footer from './components/Footer';
 import AnnouncementBar from './components/AnnouncementBar';
+import NailPaintPicker from './components/NailPaintPicker';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/cart" element={<Cart />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/nail-paint" element={<NailPaintPicker />} />
         <Route
           path="/checkout"
           element={
