@@ -75,7 +75,7 @@ function NailPaintPicker() {
           <p className="text-sm text-gray-400 mb-4">{selected.hex}</p>
 
           <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="bg-[#25D366] text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:opacity-90 transition-opacity">
-            WhatsApp par uplabdhta pucho
+            WhatsApp Ask
           </a>
         </div>
       </div>
