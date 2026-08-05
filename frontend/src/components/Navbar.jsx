@@ -49,13 +49,20 @@ function Navbar() {
         <div className="flex items-center gap-4 sm:gap-6 text-[#282C3F] font-medium">
           <button
             onClick={() => setShowMobileSearch(!showMobileSearch)}
-            className="sm:hidden text-lg"
+            className="sm:hidden"
           >
-            🔍
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="7"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
           </button>
 
-          <Link to="/cart" className="relative flex items-center gap-1">
-            <img src="/icons/cart-icon.png" alt="Cart" className="w-6 h-6" />
+          <Link to="/cart" className="relative flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <path d="M16 10a4 4 0 01-8 0"></path>
+            </svg>
             <span className="text-sm hidden md:inline">{t('cart')}</span>
             {totalItems > 0 && (
               <span className="absolute -top-2 -right-3 bg-[#FF3F6C] text-white text-[10px] font-bold rounded-full px-1.5 py-0.5">
@@ -66,15 +73,21 @@ function Navbar() {
 
           {username ? (
             <div className="flex items-center gap-2 sm:gap-3">
-              <img src="/icons/user-icon.png" alt="User" className="w-7 h-7 rounded-full border border-gray-300" />
+              <div className="w-7 h-7 rounded-full bg-[#FF3F6C] flex items-center justify-center text-white text-xs font-bold">
+                {username.charAt(0).toUpperCase()}
+              </div>
               <span className="text-sm hidden md:inline">{username}</span>
               <button onClick={logout} className="text-sm text-[#7E818C] hover:text-[#FF3F6C] whitespace-nowrap">
                 {t('logout')}
               </button>
             </div>
           ) : (
-            <Link to="/login" className="text-sm hover:text-[#FF3F6C] whitespace-nowrap">
-              {t('login')}
+            <Link to="/login" className="flex items-center gap-1.5 text-sm hover:text-[#FF3F6C] whitespace-nowrap">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span className="hidden sm:inline">{t('login')}</span>
             </Link>
           )}
         </div>
