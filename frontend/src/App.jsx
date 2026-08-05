@@ -7,6 +7,7 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import Checkout from './components/Checkout';
 import ProtectedRoute from './components/ProtectedRoute';
+import ChatWidget from './components/ChatWidget';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           }
         />
       </Routes>
+      <ChatWidget />
     </>
   );
 }
