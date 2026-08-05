@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import CategoryTiles from './CategoryTiles';
 import { useLanguage } from '../context/LanguageContext';
+import NailPaintPicker from './NailPaintPicker';
 
 function ProductList() {
   const [products, setProducts] = useState([]);
@@ -11,7 +12,7 @@ function ProductList() {
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('search') || '';
   const { t } = useLanguage();
-
+  
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/products/`)
       .then((response) => response.json())
@@ -32,6 +33,9 @@ function ProductList() {
     );
   }
 
+  const selectedCategoryObj = categories.find((cat) => cat.id === selectedCategory);
+  const isNailPaintCategory = selectedCategoryObj?.slug === 'nail-paint';
+
   return (
     <div className="min-h-screen bg-[#F5F5F6] p-6">
       {searchQuery && (
@@ -47,7 +51,9 @@ function ProductList() {
         t={t}
       />
 
-      {filteredProducts.length === 0 ? (
+      {isNailPaintCategory ? (
+        <NailPaintPicker />
+      ) : filteredProducts.length === 0 ? (
         <p className="text-center text-gray-500 mt-10">No products found.</p>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 max-w-7xl mx-auto">
