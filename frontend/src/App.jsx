@@ -8,11 +8,14 @@ import Signup from './components/Signup';
 import Checkout from './components/Checkout';
 import ProtectedRoute from './components/ProtectedRoute';
 import ChatWidget from './components/ChatWidget';
+import Footer from './components/Footer';
+import AnnouncementBar from './components/AnnouncementBar';
 
 function App() {
   return (
     <>
       <Navbar />
+      <AnnouncementBar />
       <Routes>
         <Route path="/" element={<ProductList />} />
         <Route path="/products/:id" element={<ProductDetail />} />
@@ -28,6 +31,7 @@ function App() {
           }
         />
       </Routes>
+      <Footer />
       <ChatWidget />
     </>
   );
