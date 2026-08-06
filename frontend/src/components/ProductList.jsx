@@ -31,6 +31,8 @@ function ProductList() {
       if (matchedCategory) {
         setSelectedCategory(matchedCategory.id);
       }
+    } else {
+      setSelectedCategory(null);
     }
   }, [searchParams, categories]);
 
