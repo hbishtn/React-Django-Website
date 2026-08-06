@@ -77,7 +77,7 @@ function CategoryTiles({ categories, selectedCategory, onSelect, t }) {
   }, []);
 
   return (
-    <div className="max-w-6xl mx-auto mb-8">
+    <div className="max-w-6xl mx-auto mb-0.1">
       <div className="flex gap-5 overflow-x-auto pb-2 px-1 scrollbar-hide">
         <button
           onClick={() => onSelect(null)}
