@@ -24,7 +24,7 @@ function HomeSuggestions({ products }) {
             <img
               src={bigImage.image}
               alt={big.name}
-              className="w-full h-full object-cover min-h-[280px] group-hover:scale-105 transition-transform duration-500"
+              className="w-full h-full object-cover min-h-[220px] group-hover:scale-105 transition-transform duration-500"
             />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />

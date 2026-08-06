@@ -39,7 +39,7 @@ function ChatWidget() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-20 sm:bottom-6 right-6 z-[100]">
       {isOpen && (
         <div className="w-80 h-96 bg-white rounded-2xl shadow-2xl mb-3 flex flex-col overflow-hidden border border-gray-200">
           <div className="bg-[#FF3F6C] text-white px-4 py-3 flex justify-between items-center">
