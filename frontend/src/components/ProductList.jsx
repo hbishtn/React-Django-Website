@@ -57,12 +57,14 @@ function ProductList() {
         </p>
       )}
 
-      <CategoryTiles
-        categories={categories}
-        selectedCategory={selectedCategory}
-        onSelect={setSelectedCategory}
-        t={t}
-      />
+      <div className="sticky top-0 z-30 bg-[#F5F5F6] pt-2 pb-2 -mx-6 px-6">
+        <CategoryTiles
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onSelect={setSelectedCategory}
+          t={t}
+        />
+      </div>
 
       {isNailPaintCategory ? (
         <NailPaintPicker />
