@@ -27,6 +27,10 @@ function Navbar() {
           Bisht Cosmetic
         </Link>
 
+        <div className="hidden sm:flex items-center gap-5 text-sm font-medium text-[#282C3F]">
+          <Link to="/?category=cloth" className="hover:text-[#FF3F6C]">Clothes</Link>
+          <Link to="/?category=jewelry" className="hover:text-[#FF3F6C]">Jewelry</Link>
+        </div>
         <button
           onClick={toggleLang}
           className="hidden sm:block px-3 py-1.5 text-xs font-bold rounded-full border border-gray-300 text-[#282C3F] hover:border-[#FF3F6C] transition-colors whitespace-nowrap"

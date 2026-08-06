@@ -12,7 +12,7 @@ function ProductList() {
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('search') || '';
   const { t } = useLanguage();
-  
+
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/products/`)
       .then((response) => response.json())
@@ -22,6 +22,16 @@ function ProductList() {
       .then((response) => response.json())
       .then((data) => setCategories(data));
   }, []);
+
+  useEffect(() => {
+    const categorySlug = searchParams.get('category');
+    if (categorySlug && categories.length > 0) {
+      const matchedCategory = categories.find((cat) => cat.slug === categorySlug);
+      if (matchedCategory) {
+        setSelectedCategory(matchedCategory.id);
+      }
+    }
+  }, [searchParams, categories]);
 
   let filteredProducts = selectedCategory
     ? products.filter((product) => product.category === selectedCategory)

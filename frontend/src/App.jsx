@@ -11,6 +11,7 @@ import ChatWidget from './components/ChatWidget';
 import Footer from './components/Footer';
 import AnnouncementBar from './components/AnnouncementBar';
 import NailPaintPicker from './components/NailPaintPicker';
+import BottomNav from './components/BottomNav';
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
       </Routes>
       <Footer />
       <ChatWidget />
+      <BottomNav />
     </>
   );
 }
