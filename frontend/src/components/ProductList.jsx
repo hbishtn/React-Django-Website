@@ -4,6 +4,7 @@ import ProductCard from './ProductCard';
 import CategoryTiles from './CategoryTiles';
 import { useLanguage } from '../context/LanguageContext';
 import NailPaintPicker from './NailPaintPicker';
+import HomeSuggestions from './HomeSuggestions';
 
 function ProductList() {
   const [products, setProducts] = useState([]);
@@ -63,6 +64,8 @@ function ProductList() {
 
       {isNailPaintCategory ? (
         <NailPaintPicker />
+      ) : selectedCategory === null && !searchQuery ? (
+        <HomeSuggestions products={products} />
       ) : filteredProducts.length === 0 ? (
         <p className="text-center text-gray-500 mt-10">No products found.</p>
       ) : (
