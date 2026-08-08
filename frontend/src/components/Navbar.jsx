@@ -3,10 +3,11 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
+import UserDropdown from './UserDropdown';
 
 function Navbar() {
   const { cartItems } = useCart();
-  const { username, logout } = useAuth();
+  const { username } = useAuth();
   const { lang, toggleLang, t } = useLanguage();
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const navigate = useNavigate();
@@ -76,15 +77,7 @@ function Navbar() {
           </Link>
 
           {username ? (
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="w-7 h-7 rounded-full bg-[#FF3F6C] flex items-center justify-center text-white text-xs font-bold">
-                {username.charAt(0).toUpperCase()}
-              </div>
-              <span className="text-sm hidden md:inline">{username}</span>
-              <button onClick={logout} className="text-sm text-[#7E818C] hover:text-[#FF3F6C] whitespace-nowrap">
-                {t('logout')}
-              </button>
-            </div>
+            <UserDropdown />
           ) : (
             <Link to="/login" className="flex items-center gap-1.5 text-sm hover:text-[#FF3F6C] whitespace-nowrap">
               <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
