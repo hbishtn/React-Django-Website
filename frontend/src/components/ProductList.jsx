@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import CategoryTiles from './CategoryTiles';
 import { useLanguage } from '../context/LanguageContext';
@@ -10,6 +10,7 @@ const CATEGORY_GROUPS = {
   cloth: ['cloth', 'kurti', 'plazo'],
   jewelry: ['jewelry', 'mangalsutra', 'earrings', 'jhumka'],
 };
+
 function ProductList() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -17,6 +18,7 @@ function ProductList() {
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('search') || '';
   const { t } = useLanguage();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/products/`)
@@ -39,6 +41,15 @@ function ProductList() {
       setSelectedCategory(null);
     }
   }, [searchParams, categories]);
+
+  const handleCategorySelect = (categoryId) => {
+    const category = categories.find((cat) => cat.id === categoryId);
+    if (category) {
+      navigate(`/?category=${category.slug}`);
+    } else {
+      navigate('/');
+    }
+  };
 
   const categorySlug = searchParams.get('category');
   const group = CATEGORY_GROUPS[categorySlug];
@@ -75,7 +86,7 @@ function ProductList() {
         <CategoryTiles
           categories={categories}
           selectedCategory={selectedCategory}
-          onSelect={setSelectedCategory}
+          onSelect={handleCategorySelect}
           t={t}
         />
       </div>
