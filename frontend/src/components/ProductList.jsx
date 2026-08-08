@@ -6,6 +6,10 @@ import { useLanguage } from '../context/LanguageContext';
 import NailPaintPicker from './NailPaintPicker';
 import HomeSuggestions from './HomeSuggestions';
 
+const CATEGORY_GROUPS = {
+  cloth: ['cloth', 'kurti', 'plazo'],
+  jewelry: ['jewelry', 'mangalsutra', 'earrings', 'jhumka'],
+};
 function ProductList() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -36,9 +40,19 @@ function ProductList() {
     }
   }, [searchParams, categories]);
 
-  let filteredProducts = selectedCategory
-    ? products.filter((product) => product.category === selectedCategory)
-    : products;
+  const categorySlug = searchParams.get('category');
+  const group = CATEGORY_GROUPS[categorySlug];
+
+  let filteredProducts = products;
+
+  if (group) {
+    const groupCategoryIds = categories
+      .filter((cat) => group.includes(cat.slug))
+      .map((cat) => cat.id);
+    filteredProducts = products.filter((product) => groupCategoryIds.includes(product.category));
+  } else if (selectedCategory) {
+    filteredProducts = products.filter((product) => product.category === selectedCategory);
+  }
 
   if (searchQuery) {
     filteredProducts = filteredProducts.filter((product) =>
