@@ -8,15 +8,18 @@ function Jhumka({ tilt, side }) {
       style={{ transform: `rotate(${tilt}deg)` }}
     >
       <svg width="20" height="30" viewBox="0 0 20 30">
+        {/* Hook/connector */}
         <line x1="10" y1="0" x2="10" y2="4" stroke="#D4AF37" strokeWidth="1.5" />
         <circle cx="10" cy="5" r="2" fill="#D4AF37" />
 
+        {/* Dome/bell body (jhumka shape) */}
         <path
           d="M4 8 Q4 6 10 6 Q16 6 16 8 L15 16 Q15 20 10 20 Q5 20 5 16 Z"
           fill="#C2185B"
           stroke="#D4AF37"
           strokeWidth="1"
         />
+        {/* Gold dot pattern on dome */}
         <circle cx="7" cy="10" r="0.8" fill="#D4AF37" />
         <circle cx="10" cy="9.5" r="0.8" fill="#D4AF37" />
         <circle cx="13" cy="10" r="0.8" fill="#D4AF37" />
@@ -24,8 +27,10 @@ function Jhumka({ tilt, side }) {
         <circle cx="10" cy="13" r="0.8" fill="#D4AF37" />
         <circle cx="13" cy="13" r="0.8" fill="#D4AF37" />
 
+        {/* Bottom rim */}
         <ellipse cx="10" cy="20" rx="5" ry="1.3" fill="#D4AF37" />
 
+        {/* Dangling beads */}
         <line x1="6" y1="21" x2="6" y2="25" stroke="#D4AF37" strokeWidth="1" />
         <circle cx="6" cy="26.5" r="2" fill="#FF3F6C" />
 
@@ -37,6 +42,10 @@ function Jhumka({ tilt, side }) {
       </svg>
     </div>
   );
+}
+
+function ChainArc() {
+  return null;
 }
 
 function CategoryTiles({ categories, selectedCategory, onSelect, t }) {
@@ -68,35 +77,8 @@ function CategoryTiles({ categories, selectedCategory, onSelect, t }) {
   }, []);
 
   return (
-    <div className="max-w-6xl mx-auto mb-3 relative">
-      <svg
-        className="absolute -inset-2 w-[calc(100%+16px)] h-[calc(100%+16px)] pointer-events-none"
-        preserveAspectRatio="none"
-      >
-        <defs>
-          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="1.2" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-        <rect
-          x="4"
-          y="4"
-          width="calc(100% - 8px)"
-          height="calc(100% - 8px)"
-          rx="24"
-          fill="none"
-          stroke="#FF3F6C"
-          strokeWidth="1"
-          strokeLinecap="round"
-          filter="url(#glow)"
-        />
-      </svg>
-
-      <div className="flex gap-5 overflow-x-auto pb-2 px-3 pt-3 scrollbar-hide">
+    <div className="max-w-6xl mx-auto mb-0.1">
+      <div className="flex gap-5 overflow-x-auto pb-2 px-1 scrollbar-hide">
         <button
           onClick={() => onSelect(null)}
           className="flex flex-col items-center gap-2 shrink-0"
@@ -107,6 +89,7 @@ function CategoryTiles({ categories, selectedCategory, onSelect, t }) {
             }`}
           >
             <span className="text-white text-xs font-bold z-10">{t('allCategories')}</span>
+            <ChainArc />
             <Jhumka tilt={tilt} side="left" />
             <Jhumka tilt={tilt} side="right" />
           </div>
