@@ -25,7 +25,8 @@ function Navbar() {
     <nav className="bg-white border-b border-gray-200 shadow-sm">
       <div className="px-4 sm:px-6 py-3 flex items-center gap-3">
         <Link to="/" className="text-xl sm:text-2xl font-black text-[#FF3F6C] tracking-tight whitespace-nowrap">
-          Bisht <span className="italic font-light" style={{ fontFamily: "'Brush Script MT', cursive" }}>Cosmetic</span>
+          Bisht <span className="font-light uppercase tracking-[0.18em] text-[0.85em]"
+          style={{ fontFamily: "'Trebuchet MS', sans-serif" }}>Cosmetic</span>
         </Link>
 
         <div className="hidden sm:flex items-center gap-5 text-sm font-medium text-[#282C3F]">
