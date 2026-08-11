@@ -84,7 +84,7 @@ function CategoryTiles({ categories, selectedCategory, onSelect, t }) {
           className="flex flex-col items-center gap-2 shrink-0"
         >
           <div
-            className={`relative w-16 h-16 rounded-full flex items-center justify-center bg-gradient-to-br from-[#FF3F6C] to-[#FF9F00] border-2 ${
+            className={`relative w-16 h-16 rounded-full flex items-center justify-center bg-[#FF3F6C] border-2 ${
               selectedCategory === null ? 'border-[#282C3F]' : 'border-transparent'
             }`}
           >

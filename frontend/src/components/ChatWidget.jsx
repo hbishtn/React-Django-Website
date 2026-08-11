@@ -68,19 +68,22 @@ function ChatWidget() {
             <div ref={messagesEndRef} />
           </div>
 
-          <form onSubmit={sendMessage} className="border-t border-gray-200 p-2 flex gap-2">
+          <form onSubmit={sendMessage} className="border-t border-gray-200 p-2 flex gap-2 items-center">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Type a message..."
-              className="flex-1 text-sm px-3 py-2 rounded-full bg-[#F5F5F6] focus:outline-none"
+              className="flex-1 min-w-0 text-sm px-3 py-2 rounded-full bg-[#F5F5F6] focus:outline-none"
             />
             <button
               type="submit"
-              className="bg-[#FF3F6C] text-white px-4 py-2 rounded-full text-sm font-medium"
+              className="shrink-0 bg-[#FF3F6C] text-white w-9 h-9 rounded-full flex items-center justify-center"
             >
-              Send
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
             </button>
           </form>
         </div>

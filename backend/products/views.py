@@ -6,11 +6,11 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from .models import Category, Product, Order, Cart, CartItem
-from .serializers import CategorySerializer, ProductSerializer, RegisterSerializer, OrderSerializer, CartSerializer
+from .serializers import CategorySerializer, ProductSerializer, RegisterSerializer, OrderSerializer, CartSerializer, ReviewSerializer
 from rest_framework.permissions import IsAuthenticated
 from groq import Groq
 from decouple import config
-from .models import Product
+from .models import Product, Review
 
 client = Groq(api_key=config('GROQ_API_KEY'))
 
@@ -146,4 +146,18 @@ def clear_cart_view(request):
     cart, created = Cart.objects.get_or_create(user=request.user)
     cart.items.all().delete()
     serializer = CartSerializer(cart)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_review(request, product_id):
+    rating = request.data.get('rating')
+    comment = request.data.get('comment', '')
+
+    review, created = Review.objects.update_or_create(
+        product_id=product_id,
+        user=request.user,
+        defaults={'rating': rating, 'comment': comment}
+    )
+    serializer = ReviewSerializer(review)
     return Response(serializer.data)

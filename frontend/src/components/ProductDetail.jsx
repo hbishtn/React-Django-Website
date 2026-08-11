@@ -1,18 +1,42 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 function ProductDetail() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const { addToCart } = useCart();
+  const { token } = useAuth();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/products/${id}/`)
       .then((response) => response.json())
       .then((data) => setProduct(data));
   }, [id]);
+
+  const handleReviewSubmit = (e) => {
+    e.preventDefault();
+    fetch(`${import.meta.env.VITE_API_URL}/products/${id}/review/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Token ${token}`,
+      },
+      body: JSON.stringify({ rating, comment }),
+    })
+      .then((response) => response.json())
+      .then(() => {
+        setReviewSubmitted(true);
+        fetch(`${import.meta.env.VITE_API_URL}/products/${id}/`)
+          .then((response) => response.json())
+          .then((data) => setProduct(data));
+      });
+  };
 
   if (!product) {
     return <p className="text-center mt-10">Loading...</p>;
@@ -74,7 +98,7 @@ function ProductDetail() {
           )}
         </div>
 
-        <div className="p-6">
+        <div className="p-6 flex-1">
           <h2 className="text-2xl font-bold text-gray-800">{product.name}</h2>
           <p className="text-pink-600 text-xl font-semibold mt-2">₹{product.price}</p>
           <p className="text-gray-600 mt-4">{product.description}</p>
@@ -86,6 +110,66 @@ function ProductDetail() {
           >
             Add to Cart
           </button>
+
+          <div className="mt-10 pt-6 border-t border-gray-200">
+            <h3 className="text-lg font-bold text-[#282C3F] mb-4">Reviews</h3>
+
+            {token && (
+              <form onSubmit={handleReviewSubmit} className="mb-6 bg-[#F5F5F6] p-4 rounded-xl">
+                <p className="text-sm font-medium text-[#282C3F] mb-2">Rate this product</p>
+                <div className="flex gap-1 mb-3">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setRating(star)}
+                      className={`text-2xl ${star <= rating ? 'text-[#FF9F00]' : 'text-gray-300'}`}
+                    >
+                      ★
+                    </button>
+                  ))}
+                </div>
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Write your review..."
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mb-3"
+                  rows={2}
+                />
+                <button
+                  type="submit"
+                  disabled={rating === 0}
+                  className="bg-[#FF3F6C] text-white px-5 py-2 rounded-full text-sm font-medium disabled:opacity-40"
+                >
+                  Submit Review
+                </button>
+                {reviewSubmitted && (
+                  <p className="text-green-600 text-sm mt-2">Thanks for your review!</p>
+                )}
+              </form>
+            )}
+
+            {product.reviews && product.reviews.length > 0 ? (
+              <div className="space-y-3">
+                {product.reviews.map((review) => (
+                  <div key={review.id} className="bg-white border border-gray-100 rounded-lg p-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-semibold text-[#282C3F]">{review.username}</span>
+                      <span className="text-[#FF9F00] text-sm">
+                        {'★'.repeat(review.rating)}
+                        <span className="text-gray-300">{'★'.repeat(5 - review.rating)}</span>
+                      </span>
+                    </div>
+                    {review.comment && (
+                      <p className="text-sm text-gray-500 mt-1">{review.comment}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-400">No reviews yet. Be the first to review!</p>
+            )}
+          </div>
         </div>
       </div>
     </div>
