@@ -59,7 +59,19 @@ Yaha hamare shop ke actual products hain — SIRF inhi products ki baat karo, ko
             max_tokens=120,
         )
         ai_reply = response.choices[0].message.content
-        return Response({'reply': ai_reply})
+
+        mentioned_products = []
+        for p in products:
+            if p.name.lower() in ai_reply.lower():
+                primary_image = p.images.filter(is_primary=True).first() or p.images.first()
+                mentioned_products.append({
+                    'id': p.id,
+                    'name': p.name,
+                    'price': str(p.price),
+                    'image': primary_image.image.url if primary_image else None,
+                })
+
+        return Response({'reply': ai_reply, 'products': mentioned_products})
     except Exception as e:
         return Response({'error': str(e)}, status=500)
 

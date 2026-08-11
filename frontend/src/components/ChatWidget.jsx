@@ -29,7 +29,10 @@ function ChatWidget() {
     })
       .then((response) => response.json())
       .then((data) => {
-        setMessages((prev) => [...prev, { role: 'assistant', content: data.reply }]);
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: data.reply, products: data.products || [] },
+        ]);
         setLoading(false);
       })
       .catch(() => {
@@ -49,15 +52,36 @@ function ChatWidget() {
 
           <div className="flex-1 overflow-y-auto p-3 space-y-2">
             {messages.map((msg, i) => (
-              <div
-                key={i}
-                className={`max-w-[85%] px-3 py-2 rounded-lg text-sm ${
-                  msg.role === 'user'
-                    ? 'bg-[#FF3F6C] text-white ml-auto'
-                    : 'bg-[#F5F5F6] text-[#282C3F]'
-                }`}
-              >
-                {msg.content}
+              <div key={i}>
+                <div
+                  className={`max-w-[85%] px-3 py-2 rounded-lg text-sm ${
+                    msg.role === 'user'
+                      ? 'bg-[#FF3F6C] text-white ml-auto'
+                      : 'bg-[#F5F5F6] text-[#282C3F]'
+                  }`}
+                >
+                  {msg.content}
+                </div>
+
+                {msg.products && msg.products.length > 0 && (
+                  <div className="flex flex-col gap-1.5 mt-2">
+                    {msg.products.map((p) => (
+                      <a
+                        key={p.id}
+                        href={`/products/${p.id}`}
+                        className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg p-1.5 hover:border-[#FF3F6C] transition-colors"
+                      >
+                        {p.image && (
+                          <img src={p.image} alt={p.name} className="w-10 h-10 rounded object-cover" />
+                        )}
+                        <div>
+                          <p className="text-xs font-medium text-[#282C3F]">{p.name}</p>
+                          <p className="text-xs font-bold text-[#FF3F6C]">₹{p.price}</p>
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
             {loading && (

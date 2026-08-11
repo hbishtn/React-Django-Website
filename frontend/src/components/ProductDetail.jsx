@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import ProductCard from './ProductCard';
+import RelatedProductCard from './RelatedProductCard';
 
 function ProductDetail() {
   const { id } = useParams();
@@ -12,12 +14,26 @@ function ProductDetail() {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
+  const [relatedProducts, setRelatedProducts] = useState([]);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/products/${id}/`)
       .then((response) => response.json())
       .then((data) => setProduct(data));
   }, [id]);
+
+  useEffect(() => {
+    if (product) {
+      fetch(`${import.meta.env.VITE_API_URL}/products/`)
+        .then((response) => response.json())
+        .then((data) => {
+          const related = data
+            .filter((p) => p.category === product.category && p.id !== product.id)
+            .slice(0, 3);
+          setRelatedProducts(related);
+        });
+    }
+  }, [product]);
 
   const handleReviewSubmit = (e) => {
     e.preventDefault();
@@ -172,6 +188,18 @@ function ProductDetail() {
           </div>
         </div>
       </div>
+      {relatedProducts.length > 0 && (
+        <div className="max-w-3xl mx-auto mt-8 pl-4">
+          <h3 className="text-sm font-semibold text-[#7E818C] uppercase tracking-wide mb-3">
+            You May Also Like
+          </h3>
+          <div className="grid grid-cols-3 gap-3">
+            {relatedProducts.map((relProduct) => (
+              <RelatedProductCard key={relProduct.id} product={relProduct} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
