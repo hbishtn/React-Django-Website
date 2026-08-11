@@ -11,6 +11,27 @@ const CATEGORY_GROUPS = {
   jewelry: ['jewelry', 'mangalsutra', 'earrings', 'jhumka', 'nath'],
 };
 
+function seededShuffle(array, seed) {
+  const shuffled = [...array];
+  let random = seed;
+
+  const nextRandom = () => {
+    random = (random * 9301 + 49297) % 233280;
+    return random / 233280;
+  };
+
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(nextRandom() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+function getTimeSeed() {
+  const tenHourBlock = Math.floor(Date.now() / (10 * 60 * 60 * 1000));
+  return tenHourBlock;
+}
+
 function ProductList() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -60,7 +81,8 @@ function ProductList() {
     const groupCategoryIds = categories
       .filter((cat) => group.includes(cat.slug))
       .map((cat) => cat.id);
-    filteredProducts = products.filter((product) => groupCategoryIds.includes(product.category));
+    const groupProducts = products.filter((product) => groupCategoryIds.includes(product.category));
+    filteredProducts = categorySlug === 'jewelry' ? seededShuffle(groupProducts, getTimeSeed()) : groupProducts;
   } else if (selectedCategory) {
     filteredProducts = products.filter((product) => product.category === selectedCategory);
   }

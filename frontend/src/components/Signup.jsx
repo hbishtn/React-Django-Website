@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';   // naya import
+import { GoogleLogin } from '@react-oauth/google';
 
 function Signup() {
   const [username, setUsername] = useState('');
@@ -29,6 +30,22 @@ function Signup() {
           navigate('/');
         } else {
           setError('Signup failed. Try a different username.');
+        }
+      });
+  };
+
+  const handleGoogleSuccess = (credentialResponse) => {
+    fetch(`${import.meta.env.VITE_API_URL}/google-login/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential: credentialResponse.credential }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.token) {
+          clearCart();
+          login(data.token, data.username);
+          navigate('/');
         }
       });
   };
@@ -83,6 +100,18 @@ function Signup() {
             Login
           </Link>
         </p>
+        <div className="mb-4 flex justify-center">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => console.log('Google login failed')}
+          />
+        </div>
+
+        <div className="flex items-center gap-3 mb-4">
+          <div className="flex-1 h-px bg-gray-200"></div>
+          <span className="text-xs text-gray-400">OR</span>
+          <div className="flex-1 h-px bg-gray-200"></div>
+        </div>
       </form>
     </div>
   );

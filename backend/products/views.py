@@ -11,7 +11,11 @@ from rest_framework.permissions import IsAuthenticated
 from groq import Groq
 from decouple import config
 from .models import Product, Review
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+from django.contrib.auth.models import User
 
+GOOGLE_CLIENT_ID = "949882360226-2rtash8ms56ps5kvess4crp3v1ji5krs.apps.googleusercontent.com"
 client = Groq(api_key=config('GROQ_API_KEY'))
 
 SYSTEM_PROMPT = """Tum "Shop Assistant" ho — is cosmetic shop ke liye ek friendly, helpful chatbot.
@@ -161,3 +165,25 @@ def add_review(request, product_id):
     )
     serializer = ReviewSerializer(review)
     return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def google_login_view(request):
+    token = request.data.get('credential')
+
+    try:
+        idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), GOOGLE_CLIENT_ID)
+        email = idinfo['email']
+        name = idinfo.get('name', email.split('@')[0])
+
+        user, created = User.objects.get_or_create(
+            username=email,
+            defaults={'email': email, 'first_name': name}
+        )
+
+        auth_token, _ = Token.objects.get_or_create(user=user)
+        return Response({'token': auth_token.key, 'username': user.username})
+
+    except ValueError:
+        return Response({'error': 'Invalid Google token'}, status=400)
