@@ -8,7 +8,7 @@ import HomeSuggestions from './HomeSuggestions';
 
 const CATEGORY_GROUPS = {
   cloth: ['cloth', 'kurti', 'plazo'],
-  jewelry: ['jewelry', 'mangalsutra', 'earrings', 'jhumka'],
+  jewelry: ['jewelry', 'mangalsutra', 'earrings', 'jhumka', 'nath'],
 };
 
 function ProductList() {
