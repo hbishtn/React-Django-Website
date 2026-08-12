@@ -19,15 +19,48 @@ function QuickAddProduct() {
         .then((response) => response.json())
         .then((data) => setCategories(data));
     }, []);
+    
 
-  const handleImageSelect = (e) => {
+  const handleImageSelect = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    setImage(file);
-    setImagePreview(URL.createObjectURL(file));
+
+    const compressed = await compressImage(file);
+    setImage(compressed);
+    setImagePreview(URL.createObjectURL(compressed));
     setName('');
     setDescription('');
-  };
+    };
+
+  const compressImage = (file) => {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const maxWidth = 800;
+            const scale = Math.min(1, maxWidth / img.width);
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob(
+            (blob) => {
+                const compressedFile = new File([blob], file.name, { type: 'image/jpeg' });
+                resolve(compressedFile);
+            },
+            'image/jpeg',
+            0.7
+            );
+        };
+        img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+    };
 
   const handleAnalyze = () => {
     if (!image) return;
