@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 function UserDropdown() {
-  const { username, logout } = useAuth();
+  const { username, logout, isStaff } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -49,6 +50,20 @@ function UserDropdown() {
               </svg>
               My Orders
             </button>
+
+            {isStaff && (
+              <Link
+                to="/x7k9-quick-add"
+                onClick={() => setIsOpen(false)}
+                className="w-full text-left px-4 py-2.5 text-sm text-[#282C3F] hover:bg-[#F5F5F6] flex items-center gap-2"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Add Product
+              </Link>
+            )}
           </div>
 
           <div className="border-t border-gray-100">

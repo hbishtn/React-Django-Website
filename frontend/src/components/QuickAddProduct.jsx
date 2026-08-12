@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 function QuickAddProduct() {
@@ -12,6 +12,13 @@ function QuickAddProduct() {
   const [stock, setStock] = useState('10');
   const [categorySlug, setCategorySlug] = useState('jewelry');
   const [message, setMessage] = useState('');
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_URL}/categories/`)
+        .then((response) => response.json())
+        .then((data) => setCategories(data));
+    }, []);
 
   const handleImageSelect = (e) => {
     const file = e.target.files[0];
@@ -143,13 +150,18 @@ function QuickAddProduct() {
             onChange={(e) => setStock(e.target.value)}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mb-3"
           />
-          <input
-            type="text"
-            placeholder="Category slug (e.g. jewelry)"
+          <select
             value={categorySlug}
             onChange={(e) => setCategorySlug(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mb-4"
-          />
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mb-4 bg-white"
+            >
+            <option value="">Select category</option>
+            {categories.map((cat) => (
+                <option key={cat.id} value={cat.slug}>
+                {cat.name}
+                </option>
+            ))}
+            </select>
 
           <button
             type="submit"
