@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
-from .models import Category, Product, Order, Cart, CartItem
+from .models import Category, Product, Order, Cart, CartItem, ProductImage
 from .serializers import CategorySerializer, ProductSerializer, RegisterSerializer, OrderSerializer, CartSerializer, ReviewSerializer
 from rest_framework.permissions import IsAuthenticated
 from groq import Groq
@@ -14,6 +14,8 @@ from .models import Product, Review
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from django.contrib.auth.models import User
+import base64
+from django.core.files.base import ContentFile
 
 GOOGLE_CLIENT_ID = "949882360226-2rtash8ms56ps5kvess4crp3v1ji5krs.apps.googleusercontent.com"
 client = Groq(api_key=config('GROQ_API_KEY'))
@@ -51,7 +53,7 @@ Yaha hamare shop ke actual products hain — SIRF inhi products ki baat karo, ko
 
     try:
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="openai/gpt-oss-20b",
             messages=[
                 {"role": "system", "content": system_prompt_with_data},
                 {"role": "user", "content": user_message},
@@ -92,7 +94,7 @@ def register_view(request):
     if serializer.is_valid():
         user = serializer.save()
         token, created = Token.objects.get_or_create(user=user)
-        return Response({'token': token.key, 'username': user.username})
+        return Response({'token': token.key, 'username': user.username, 'is_staff': user.is_staff})
     return Response(serializer.errors, status=400)
 
 
@@ -105,7 +107,7 @@ def login_view(request):
 
     if user:
         token, created = Token.objects.get_or_create(user=user)
-        return Response({'token': token.key, 'username': user.username})
+        return Response({'token': token.key, 'username': user.username, 'is_staff': user.is_staff})
     return Response({'error': 'Invalid credentials'}, status=400)
 
 
@@ -199,3 +201,79 @@ def google_login_view(request):
 
     except ValueError:
         return Response({'error': 'Invalid Google token'}, status=400)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def analyze_product_image(request):
+    if not request.user.is_staff:
+        return Response({'error': 'Not authorized'}, status=403)
+
+    image_file = request.FILES.get('image')
+    if not image_file:
+        return Response({'error': 'Image required'}, status=400)
+
+    image_data = base64.b64encode(image_file.read()).decode('utf-8')
+
+    try:
+        response = client.chat.completions.create(
+            model="qwen/qwen3.6-27b",
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": "Ye ek jewelry/cosmetic product ki photo hai jo ek chhoti Indian dukaan (jaise jhumka, mangalsutra, bracelet, kundan set) ke liye hai. Ek attractive product naam (Hindi-English mix mein) aur 2-line description do. Sirf JSON format mein jawab do: {\"name\": \"...\", \"description\": \"...\"}"
+                        },
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": f"data:image/jpeg;base64,{image_data}"}
+                        }
+                    ]
+                }
+            ],
+            max_tokens=1500,
+        )
+        ai_text = response.choices[0].message.content
+        import re
+
+        if '</think>' in ai_text:
+            cleaned_text = ai_text.split('</think>')[-1]
+        else:
+            cleaned_text = ai_text
+
+        return Response({'suggestion': cleaned_text.strip()})
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def quick_add_product(request):
+    if not request.user.is_staff:
+        return Response({'error': 'Not authorized'}, status=403)
+
+    name = request.data.get('name')
+    description = request.data.get('description')
+    price = request.data.get('price')
+    stock = request.data.get('stock', 10)
+    category_slug = request.data.get('category_slug')
+    image_file = request.FILES.get('image')
+
+    try:
+        category = Category.objects.get(slug=category_slug)
+    except Category.DoesNotExist:
+        return Response({'error': f'Category "{category_slug}" not found'}, status=400)
+
+    product = Product.objects.create(
+        name=name,
+        description=description,
+        price=price,
+        stock=stock,
+        category=category,
+    )
+
+    if image_file:
+        ProductImage.objects.create(product=product, image=image_file, is_primary=True)
+
+    serializer = ProductSerializer(product)
+    return Response(serializer.data)

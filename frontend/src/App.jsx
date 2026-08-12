@@ -12,6 +12,8 @@ import Footer from './components/Footer';
 import AnnouncementBar from './components/AnnouncementBar';
 import NailPaintPicker from './components/NailPaintPicker';
 import BottomNav from './components/BottomNav';
+import QuickAddProduct from './components/QuickAddProduct';
+import AdminRoute from './components/AdminRoute';
 
 function App() {
   return (
@@ -31,6 +33,14 @@ function App() {
             <ProtectedRoute>
               <Checkout />
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/x7k9-quick-add"
+          element={
+            <AdminRoute>
+              <QuickAddProduct />
+            </AdminRoute>
           }
         />
       </Routes>

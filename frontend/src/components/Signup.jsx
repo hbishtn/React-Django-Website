@@ -26,7 +26,7 @@ function Signup() {
       .then((data) => {
         if (data.token) {
           clearCart(); 
-          login(data.token, data.username);
+          login(data.token, data.username, data.is_staff);
           navigate('/');
         } else {
           setError('Signup failed. Try a different username.');
