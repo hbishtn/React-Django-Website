@@ -13,6 +13,9 @@ function QuickAddProduct() {
   const [categorySlug, setCategorySlug] = useState('jewelry');
   const [message, setMessage] = useState('');
   const [categories, setCategories] = useState([]);
+  const [secondImage, setSecondImage] = useState(null);
+  const [secondImagePreview, setSecondImagePreview] = useState(null);
+  const [fileInputKey, setFileInputKey] = useState(0);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/categories/`)
@@ -31,6 +34,29 @@ function QuickAddProduct() {
     setName('');
     setDescription('');
     };
+
+  const handleSecondImageSelect = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const compressed = await compressImage(file);
+    setSecondImage(compressed);
+    setSecondImagePreview(URL.createObjectURL(compressed));
+    };
+
+  const removeMainImage = () => {
+    setImage(null);
+    setImagePreview(null);
+    setSecondImage(null);
+    setSecondImagePreview(null);
+    setName('');
+    setDescription('');
+  };
+
+  const removeSecondImage = () => {
+    setSecondImage(null);
+    setSecondImagePreview(null);
+  };
 
   const compressImage = (file) => {
     return new Promise((resolve) => {
@@ -112,6 +138,10 @@ function QuickAddProduct() {
     formData.append('stock', stock);
     formData.append('category_slug', categorySlug);
     formData.append('image', image);
+    if (secondImage) {
+        formData.append('second_image', secondImage);
+    }
+
 
     fetch(`${import.meta.env.VITE_API_URL}/quick-add-product/`, {
       method: 'POST',
@@ -123,6 +153,8 @@ function QuickAddProduct() {
         setMessage('Product added! 🎉');
         setImage(null);
         setImagePreview(null);
+        setSecondImage(null);
+        setSecondImagePreview(null);
         setName('');
         setDescription('');
         setPrice('');
@@ -135,10 +167,52 @@ function QuickAddProduct() {
       <div className="max-w-md mx-auto bg-white rounded-xl shadow-md p-6">
         <h2 className="text-xl font-bold text-[#282C3F] mb-4">Quick Add Product</h2>
 
-        <input type="file" accept="image/*" onChange={handleImageSelect} className="mb-3" />
-
+        {!imagePreview && (
+          <label className="w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-[#FF3F6C] transition-colors mb-3">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7E818C" strokeWidth="1.8">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <span className="text-sm text-gray-500 mt-2">Upload Product Image</span>
+            <input type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
+          </label>
+        )}
+        
         {imagePreview && (
-          <img src={imagePreview} alt="Preview" className="w-full h-48 object-cover rounded-lg mb-3" />
+          <div className="relative mb-3">
+            <img src={imagePreview} alt="Preview" className="w-full h-48 object-cover rounded-lg" />
+
+            <button
+              type="button"
+              onClick={removeMainImage}
+              className="absolute top-2 left-2 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center text-sm"
+            >
+              ×
+            </button>
+
+            <label className="absolute top-2 right-2 w-9 h-9 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center cursor-pointer hover:border-[#FF3F6C] transition-colors">
+              <span className="text-gray-500 text-lg leading-none">+</span>
+              <input type="file" accept="image/*" onChange={handleSecondImageSelect} className="hidden" />
+            </label>
+
+            {secondImagePreview && (
+              <div className="absolute bottom-2 right-2">
+                <img
+                  src={secondImagePreview}
+                  alt="Second"
+                  className="w-12 h-12 rounded-lg object-cover border-2 border-white shadow-md"
+                />
+                <button
+                  type="button"
+                  onClick={removeSecondImage}
+                  className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-black/70 text-white flex items-center justify-center text-xs"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+          </div>
         )}
 
         {image && !name && (
@@ -147,6 +221,7 @@ function QuickAddProduct() {
             disabled={analyzing}
             className="w-full bg-[#282C3F] text-white py-2 rounded-full text-sm font-medium mb-4 disabled:opacity-50"
           >
+
             {analyzing ? 'Analyzing...' : '✨ Auto-Generate with AI'}
           </button>
         )}

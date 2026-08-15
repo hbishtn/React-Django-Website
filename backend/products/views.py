@@ -258,6 +258,7 @@ def quick_add_product(request):
     stock = request.data.get('stock', 10)
     category_slug = request.data.get('category_slug')
     image_file = request.FILES.get('image')
+    second_image_file = request.FILES.get('second_image')
 
     try:
         category = Category.objects.get(slug=category_slug)
@@ -274,6 +275,9 @@ def quick_add_product(request):
 
     if image_file:
         ProductImage.objects.create(product=product, image=image_file, is_primary=True)
+
+    if second_image_file:
+        ProductImage.objects.create(product=product, image=second_image_file, is_primary=False)
 
     serializer = ProductSerializer(product)
     return Response(serializer.data)
