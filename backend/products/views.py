@@ -16,6 +16,7 @@ from google.auth.transport import requests as google_requests
 from django.contrib.auth.models import User
 import base64
 from django.core.files.base import ContentFile
+from django.utils.text import slugify
 
 GOOGLE_CLIENT_ID = "949882360226-2rtash8ms56ps5kvess4crp3v1ji5krs.apps.googleusercontent.com"
 client = Groq(api_key=config('GROQ_API_KEY'))
@@ -280,4 +281,24 @@ def quick_add_product(request):
         ProductImage.objects.create(product=product, image=second_image_file, is_primary=False)
 
     serializer = ProductSerializer(product)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_category(request):
+    if not request.user.is_staff:
+        return Response({'error': 'Not authorized'}, status=403)
+
+    name = request.data.get('name')
+    if not name:
+        return Response({'error': 'Name is required'}, status=400)
+
+    slug = slugify(name)
+
+    category, created = Category.objects.get_or_create(
+        slug=slug,
+        defaults={'name': name}
+    )
+
+    serializer = CategorySerializer(category)
     return Response(serializer.data)

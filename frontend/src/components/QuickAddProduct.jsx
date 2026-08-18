@@ -16,6 +16,8 @@ function QuickAddProduct() {
   const [secondImage, setSecondImage] = useState(null);
   const [secondImagePreview, setSecondImagePreview] = useState(null);
   const [fileInputKey, setFileInputKey] = useState(0);
+  const [showNewCategory, setShowNewCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/categories/`)
@@ -87,7 +89,25 @@ function QuickAddProduct() {
         reader.readAsDataURL(file);
     });
     };
+  const handleCreateCategory = () => {
+    if (!newCategoryName.trim()) return;
 
+    fetch(`${import.meta.env.VITE_API_URL}/create-category/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Token ${token}`,
+      },
+      body: JSON.stringify({ name: newCategoryName }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setCategories((prev) => [...prev, data]);
+        setCategorySlug(data.slug);
+        setNewCategoryName('');
+        setShowNewCategory(false);
+      });
+};
   const handleAnalyze = () => {
     if (!image) return;
     setAnalyzing(true);
@@ -259,17 +279,44 @@ function QuickAddProduct() {
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mb-3"
           />
           <select
-            value={categorySlug}
-            onChange={(e) => setCategorySlug(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mb-4 bg-white"
-            >
+            value={showNewCategory ? '__new__' : categorySlug}
+            onChange={(e) => {
+              if (e.target.value === '__new__') {
+                setShowNewCategory(true);
+              } else {
+                setCategorySlug(e.target.value);
+                setShowNewCategory(false);
+              }
+            }}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mb-2 bg-white"
+          >
             <option value="">Select category</option>
             {categories.map((cat) => (
-                <option key={cat.id} value={cat.slug}>
+              <option key={cat.id} value={cat.slug}>
                 {cat.name}
-                </option>
+              </option>
             ))}
-            </select>
+            <option value="__new__">+ New Category</option>
+          </select>
+
+          {showNewCategory && (
+            <div className="flex gap-2 mb-4">
+              <input
+                type="text"
+                placeholder="New category name"
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm"
+              />
+              <button
+                type="button"
+                onClick={handleCreateCategory}
+                className="bg-[#282C3F] text-white px-4 rounded-lg text-sm font-medium"
+              >
+                Create
+              </button>
+            </div>
+          )}
 
           <button
             type="submit"
