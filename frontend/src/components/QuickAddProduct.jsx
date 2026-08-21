@@ -18,6 +18,7 @@ function QuickAddProduct() {
   const [fileInputKey, setFileInputKey] = useState(0);
   const [showNewCategory, setShowNewCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
+  const [recentlyAdded, setRecentlyAdded] = useState([]);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/categories/`)
@@ -169,8 +170,9 @@ function QuickAddProduct() {
       body: formData,
     })
       .then((response) => response.json())
-      .then(() => {
+      .then((data) => {
         setMessage('Product added! 🎉');
+        setRecentlyAdded((prev) => [data, ...prev].slice(0, 5));
         setImage(null);
         setImagePreview(null);
         setSecondImage(null);
@@ -178,6 +180,7 @@ function QuickAddProduct() {
         setName('');
         setDescription('');
         setPrice('');
+        setFileInputKey((prev) => prev + 1);
       })
       .catch(() => setMessage('Save fail ho gaya.'));
   };
@@ -325,6 +328,22 @@ function QuickAddProduct() {
             Save Product
           </button>
         </form>
+        {recentlyAdded.length > 0 && (
+          <div className="mt-6 pt-4 border-t border-gray-200">
+            <p className="text-xs text-gray-400 mb-2">Recently added</p>
+            <div className="space-y-2">
+              {recentlyAdded.map((p) => (
+                <div key={p.id} className="flex items-center gap-2 bg-[#F5F5F6] rounded-lg p-2">
+                  {p.images?.[0] && (
+                    <img src={p.images[0].image} alt={p.name} className="w-8 h-8 rounded object-cover" />
+                  )}
+                  <span className="text-xs text-[#282C3F]">{p.name}</span>
+                  <span className="text-xs text-[#FF3F6C] ml-auto">₹{p.price}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {message && <p className="text-sm text-center mt-3 text-[#282C3F]">{message}</p>}
       </div>
