@@ -113,12 +113,18 @@ function ChatWidget() {
         </div>
       )}
 
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-14 h-14 rounded-full bg-[#FF3F6C] text-white text-2xl shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
-      >
-        {isOpen ? '×' : '💬'}
-      </button>
+      <div className="relative w-14 h-14">
+        <div className="absolute inset-0 animate-spin-slow">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-[#FF9F00] shadow-[0_0_8px_2px_rgba(255,159,0,0.8)]"></div>
+        </div>
+
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="relative w-14 h-14 rounded-full bg-[#FF3F6C] text-white text-2xl shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
+        >
+          {isOpen ? '×' : '💬'}
+        </button>
+      </div>
     </div>
   );
 }
