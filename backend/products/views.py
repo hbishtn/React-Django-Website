@@ -59,7 +59,7 @@ Yaha hamare shop ke actual products hain — SIRF inhi products ki baat karo, ko
                 {"role": "system", "content": system_prompt_with_data},
                 {"role": "user", "content": user_message},
             ],
-            max_tokens=120,
+            max_tokens=300,
         )
         ai_reply = response.choices[0].message.content
 
