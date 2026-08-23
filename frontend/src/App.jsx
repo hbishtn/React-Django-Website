@@ -14,6 +14,7 @@ import NailPaintPicker from './components/NailPaintPicker';
 import BottomNav from './components/BottomNav';
 import QuickAddProduct from './components/QuickAddProduct';
 import AdminRoute from './components/AdminRoute';
+import EditProduct from './components/EditProduct';
 
 function App() {
   return (
@@ -40,6 +41,14 @@ function App() {
           element={
             <AdminRoute>
               <QuickAddProduct />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/x7k9-edit-product/:id"
+          element={
+            <AdminRoute>
+              <EditProduct />
             </AdminRoute>
           }
         />

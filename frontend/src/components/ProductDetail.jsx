@@ -9,12 +9,13 @@ function ProductDetail() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const { addToCart } = useCart();
-  const { token } = useAuth();
+  const { token, isStaff } = useAuth();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
   const [relatedProducts, setRelatedProducts] = useState([]);
+
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/products/${id}/`)
@@ -126,6 +127,14 @@ function ProductDetail() {
           >
             Add to Cart
           </button>
+          {isStaff && (
+            <Link
+              to={`/x7k9-edit-product/${product.id}`}
+              className="mt-3 block text-center border border-[#282C3F] text-[#282C3F] py-2 rounded-full text-sm font-medium"
+            >
+              Edit Product
+            </Link>
+          )}
 
           <div className="mt-10 pt-6 border-t border-gray-200">
             <h3 className="text-lg font-bold text-[#282C3F] mb-4">Reviews</h3>

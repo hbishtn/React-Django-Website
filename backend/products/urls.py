@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import CategoryViewSet, ProductViewSet, register_view, login_view, OrderViewSet, get_cart, add_to_cart, remove_from_cart, clear_cart_view, chat_view, add_review, analyze_product_image
-from .views import google_login_view, quick_add_product, create_category, remove_background
+from .views import google_login_view, quick_add_product, create_category, remove_background, edit_product
 
 router = DefaultRouter()
 router.register('categories', CategoryViewSet)
@@ -23,4 +23,5 @@ urlpatterns = [
     path('quick-add-product/', quick_add_product, name='quick_add_product'),
     path('create-category/', create_category, name='create_category'),
     path('remove-background/', remove_background, name='remove_background'),
+    path('products/<int:product_id>/edit/', edit_product, name='edit_product'),
 ]

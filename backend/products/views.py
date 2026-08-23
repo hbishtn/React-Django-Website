@@ -326,3 +326,39 @@ def remove_background(request):
         return Response({'image': f'data:image/png;base64,{result}'})
     else:
         return Response({'error': 'Background removal failed'}, status=500)
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def edit_product(request, product_id):
+    if not request.user.is_staff:
+        return Response({'error': 'Not authorized'}, status=403)
+
+    try:
+        product = Product.objects.get(id=product_id)
+    except Product.DoesNotExist:
+        return Response({'error': 'Product not found'}, status=404)
+
+    name = request.data.get('name')
+    description = request.data.get('description')
+    price = request.data.get('price')
+    stock = request.data.get('stock')
+    category_slug = request.data.get('category_slug')
+    new_image = request.FILES.get('image')
+
+    if name: product.name = name
+    if description: product.description = description
+    if price: product.price = price
+    if stock: product.stock = stock
+    if category_slug:
+        try:
+            product.category = Category.objects.get(slug=category_slug)
+        except Category.DoesNotExist:
+            pass
+
+    product.save()
+
+    if new_image:
+        ProductImage.objects.create(product=product, image=new_image, is_primary=False)
+
+    serializer = ProductSerializer(product)
+    return Response(serializer.data)
