@@ -17,6 +17,7 @@ from django.contrib.auth.models import User
 import base64
 from django.core.files.base import ContentFile
 from django.utils.text import slugify
+import requests as http_requests
 
 GOOGLE_CLIENT_ID = "949882360226-2rtash8ms56ps5kvess4crp3v1ji5krs.apps.googleusercontent.com"
 client = Groq(api_key=config('GROQ_API_KEY'))
@@ -302,3 +303,26 @@ def create_category(request):
 
     serializer = CategorySerializer(category)
     return Response(serializer.data)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def remove_background(request):
+    if not request.user.is_staff:
+        return Response({'error': 'Not authorized'}, status=403)
+
+    image_file = request.FILES.get('image')
+    if not image_file:
+        return Response({'error': 'Image required'}, status=400)
+
+    response = http_requests.post(
+        'https://api.remove.bg/v1.0/removebg',
+        files={'image_file': image_file.read()},
+        data={'size': 'auto'},
+        headers={'X-Api-Key': config('REMOVEBG_API_KEY')},
+    )
+
+    if response.status_code == 200:
+        result = base64.b64encode(response.content).decode('utf-8')
+        return Response({'image': f'data:image/png;base64,{result}'})
+    else:
+        return Response({'error': 'Background removal failed'}, status=500)

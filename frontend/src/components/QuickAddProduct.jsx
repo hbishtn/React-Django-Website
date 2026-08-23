@@ -19,6 +19,7 @@ function QuickAddProduct() {
   const [showNewCategory, setShowNewCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [recentlyAdded, setRecentlyAdded] = useState([]);
+  const [removingBg, setRemovingBg] = useState(false);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/categories/`)
@@ -148,6 +149,34 @@ function QuickAddProduct() {
         });
     };
 
+  const handleRemoveBackground = () => {
+    if (!image) return;
+    setRemovingBg(true);
+
+    const formData = new FormData();
+    formData.append('image', image);
+
+    fetch(`${import.meta.env.VITE_API_URL}/remove-background/`, {
+      method: 'POST',
+      headers: { Authorization: `Token ${token}` },
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setRemovingBg(false);
+        if (data.image) {
+          fetch(data.image)
+            .then((res) => res.blob())
+            .then((blob) => {
+              const newFile = new File([blob], 'bg-removed.png', { type: 'image/png' });
+              setImage(newFile);
+              setImagePreview(data.image);
+            });
+        }
+      })
+      .catch(() => setRemovingBg(false));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setMessage('Saving...');
@@ -213,6 +242,16 @@ function QuickAddProduct() {
             >
               ×
             </button>
+            {imagePreview && (
+              <button
+                type="button"
+                onClick={handleRemoveBackground}
+                disabled={removingBg}
+                className="absolute top-2 left-12 bg-white shadow-md px-2 py-1 rounded-full text-xs font-medium border border-gray-200 hover:border-[#FF3F6C] disabled:opacity-50"
+              >
+                {removingBg ? '...' : 'Remove BG'}
+              </button>
+            )}
 
             <label className="absolute top-2 right-2 w-9 h-9 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center cursor-pointer hover:border-[#FF3F6C] transition-colors">
               <span className="text-gray-500 text-lg leading-none">+</span>
