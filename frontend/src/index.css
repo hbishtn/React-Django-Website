@@ -34,5 +34,5 @@ body {
 }
 
 .animate-spin-slow {
-  animation: spin-slow 3s linear infinite;
+  animation: spin-slow 2s linear infinite;
 }
