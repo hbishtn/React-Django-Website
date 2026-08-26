@@ -44,7 +44,7 @@ function ProductList() {
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/products/`)
       .then((response) => response.json())
-      .then((data) => setProducts(data));
+      .then((data) => setProducts(data.results || data));
 
     fetch(`${import.meta.env.VITE_API_URL}/categories/`)
       .then((response) => response.json())

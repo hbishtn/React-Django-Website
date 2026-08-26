@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import ProductCard from './ProductCard';
@@ -15,8 +15,9 @@ function ProductDetail() {
   const [comment, setComment] = useState('');
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
   const [relatedProducts, setRelatedProducts] = useState([]);
-
-
+  const [colorVariants, setColorVariants] = useState([]);
+  const navigate = useNavigate();
+  
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/products/${id}/`)
       .then((response) => response.json())
@@ -32,6 +33,17 @@ function ProductDetail() {
             .filter((p) => p.category === product.category && p.id !== product.id)
             .slice(0, 3);
           setRelatedProducts(related);
+        });
+    }
+  }, [product]);
+
+  useEffect(() => {
+    if (product && product.color_group) {
+      fetch(`${import.meta.env.VITE_API_URL}/products/`)
+        .then((response) => response.json())
+        .then((data) => {
+          const variants = data.filter((p) => p.color_group === product.color_group);
+          setColorVariants(variants);
         });
     }
   }, [product]);
@@ -118,6 +130,24 @@ function ProductDetail() {
         <div className="p-6 flex-1">
           <h2 className="text-2xl font-bold text-gray-800">{product.name}</h2>
           <p className="text-pink-600 text-xl font-semibold mt-2">₹{product.price}</p>
+          {colorVariants.length > 1 && (
+            <div className="mt-4">
+              <p className="text-sm text-gray-500 mb-2">Available shades:</p>
+              <div className="flex gap-2">
+                {colorVariants.map((variant) => (
+                  <button
+                    key={variant.id}
+                    onClick={() => navigate(`/products/${variant.id}`)}
+                    className={`w-8 h-8 rounded-full border-2 ${
+                      variant.id === product.id ? 'border-[#282C3F] scale-110' : 'border-white'
+                    }`}
+                    style={{ backgroundColor: variant.color_hex, boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }}
+                    title={variant.color_name}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
           <p className="text-gray-600 mt-4">{product.description}</p>
           <p className="text-sm text-gray-400 mt-4">Stock: {product.stock}</p>
 
