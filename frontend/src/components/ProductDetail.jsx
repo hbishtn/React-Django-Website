@@ -26,11 +26,11 @@ function ProductDetail() {
 
   useEffect(() => {
     if (product) {
-      fetch(`${import.meta.env.VITE_API_URL}/products/`)
+      fetch(`${import.meta.env.VITE_API_URL}/products/?page_size=100`)
         .then((response) => response.json())
         .then((data) => {
           const productList = data.results || data;
-          const related = data
+          const related = productList
             .filter((p) => p.category === product.category && p.id !== product.id)
             .slice(0, 3);
           setRelatedProducts(related);

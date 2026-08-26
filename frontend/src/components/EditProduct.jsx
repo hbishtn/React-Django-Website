@@ -29,7 +29,7 @@ function EditProduct() {
         setCurrentImages(data.images || []);
       });
 
-    fetch(`${import.meta.env.VITE_API_URL}/categories/`)
+    fetch(`${import.meta.env.VITE_API_URL}/categories/?page_size=100`)
       .then((response) => response.json())
       .then((data) => setCategories(data.results || data));
   }, [id]);

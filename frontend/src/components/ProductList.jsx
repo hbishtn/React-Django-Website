@@ -42,11 +42,11 @@ function ProductList() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/products/`)
+    fetch(`${import.meta.env.VITE_API_URL}/products/?page_size=100`)
       .then((response) => response.json())
       .then((data) => setProducts(data.results || data));
 
-    fetch(`${import.meta.env.VITE_API_URL}/categories/`)
+    fetch(`${import.meta.env.VITE_API_URL}/categories/?page_size=100`)
       .then((response) => response.json())
       .then((data) => setCategories(data.results || data));
   }, []);

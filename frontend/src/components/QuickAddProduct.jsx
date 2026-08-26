@@ -22,7 +22,7 @@ function QuickAddProduct() {
   const [removingBg, setRemovingBg] = useState(false);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/categories/`)
+    fetch(`${import.meta.env.VITE_API_URL}/categories/?page_size=100`)
         .then((response) => response.json())
         .then((data) => setCategories(data.results || data));
     }, []);
