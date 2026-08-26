@@ -29,6 +29,7 @@ function ProductDetail() {
       fetch(`${import.meta.env.VITE_API_URL}/products/`)
         .then((response) => response.json())
         .then((data) => {
+          const productList = data.results || data;
           const related = data
             .filter((p) => p.category === product.category && p.id !== product.id)
             .slice(0, 3);

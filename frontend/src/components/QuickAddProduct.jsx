@@ -24,7 +24,7 @@ function QuickAddProduct() {
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/categories/`)
         .then((response) => response.json())
-        .then((data) => setCategories(data));
+        .then((data) => setCategories(data.results || data));
     }, []);
     
 
