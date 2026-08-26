@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
+from django.db.models import Q
 from .models import Category, Product, Order, Cart, CartItem, ProductImage
 from .serializers import CategorySerializer, ProductSerializer, RegisterSerializer, OrderSerializer, CartSerializer, ReviewSerializer
 from rest_framework.permissions import IsAuthenticated
@@ -18,6 +19,7 @@ import base64
 from django.core.files.base import ContentFile
 from django.utils.text import slugify
 import requests as http_requests
+
 
 GOOGLE_CLIENT_ID = "949882360226-2rtash8ms56ps5kvess4crp3v1ji5krs.apps.googleusercontent.com"
 client = Groq(api_key=config('GROQ_API_KEY'))
@@ -41,7 +43,28 @@ def chat_view(request):
     if not user_message:
         return Response({'error': 'Message is required'}, status=400)
 
-    products = Product.objects.all()[:30]
+    import re
+    words = [w for w in re.findall(r'\w+', user_message.lower()) if len(w) > 2]
+
+    search_query = Q()
+    for word in words:
+        search_query |= (
+            Q(name__icontains=word) |
+            Q(category__name__icontains=word) |
+            Q(description__icontains=word) |
+            Q(color_name__icontains=word)
+        )
+
+    if words:
+        products = Product.objects.filter(search_query).distinct().order_by('-created_at')[:30]
+    else:
+        products = Product.objects.none()
+
+    if not products.exists():
+        products = Product.objects.all().order_by('-created_at')[:20]
+
+    all_categories = ", ".join(Category.objects.values_list('name', flat=True))
+
     product_list = "\n".join([
         f"- {p.name} (₹{p.price}, category: {p.category.name}, stock: {p.stock})"
         for p in products
@@ -49,9 +72,11 @@ def chat_view(request):
 
     system_prompt_with_data = SYSTEM_PROMPT + f"""
 
-Yaha hamare shop ke actual products hain — SIRF inhi products ki baat karo, koi naya product mat banao:
-{product_list}
-"""
+    Hamari shop ki categories: {all_categories}
+
+    Yaha user ke sawaal se related products hain (agar user kisi specific cheez ke baare mein na poochhe, to ye humare latest products hain) — SIRF inhi products ki baat karo, koi naya product mat banao. Agar in mein se koi match na mile, to user ko bolo ki wo product filhaal available nahi hai ya category browse karne ko bolo:
+    {product_list}
+    """
 
     try:
         response = client.chat.completions.create(
