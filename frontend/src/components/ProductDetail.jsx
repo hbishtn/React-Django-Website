@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import ProductCard from './ProductCard';
 import RelatedProductCard from './RelatedProductCard';
+import LoadingScreen from './LoadingScreen';
 
 function ProductDetail() {
   const { id } = useParams();
@@ -69,8 +70,8 @@ function ProductDetail() {
   };
 
   if (!product) {
-    return <p className="text-center mt-10">Loading...</p>;
-  }
+    return <LoadingScreen message="Product load ho raha hai..." />;
+}
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">

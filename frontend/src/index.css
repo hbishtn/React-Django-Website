@@ -36,3 +36,33 @@ body {
 .animate-spin-slow {
   animation: spin-slow 2s linear infinite;
 }
+
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, #eeeeee 0%, #f8f8f8 50%, #eeeeee 100%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.4s ease-out forwards;
+}

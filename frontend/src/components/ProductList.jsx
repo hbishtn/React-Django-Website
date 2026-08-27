@@ -5,6 +5,7 @@ import CategoryTiles from './CategoryTiles';
 import { useLanguage } from '../context/LanguageContext';
 import NailPaintPicker from './NailPaintPicker';
 import HomeSuggestions from './HomeSuggestions';
+import ProductCardSkeleton from './ProductCardSkeleton';
 
 const CATEGORY_GROUPS = {
   cloth: ['cloth', 'kurti', 'plazo'],
@@ -35,6 +36,7 @@ function getTimeSeed() {
 function ProductList() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('search') || '';
@@ -44,7 +46,8 @@ function ProductList() {
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/products/?page_size=100`)
       .then((response) => response.json())
-      .then((data) => setProducts(data.results || data));
+      .then((data) => setProducts(data.results || data))
+      .finally(() => setLoading(false));
 
     fetch(`${import.meta.env.VITE_API_URL}/categories/?page_size=100`)
       .then((response) => response.json())
@@ -113,7 +116,13 @@ function ProductList() {
         />
       </div>
 
-      {isNailPaintCategory ? (
+      {loading ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 max-w-7xl mx-auto">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <ProductCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : isNailPaintCategory ? (
         <NailPaintPicker />
       ) : selectedCategory === null && !searchQuery ? (
         <HomeSuggestions products={products} />
