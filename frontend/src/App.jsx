@@ -15,6 +15,8 @@ import BottomNav from './components/BottomNav';
 import QuickAddProduct from './components/QuickAddProduct';
 import AdminRoute from './components/AdminRoute';
 import EditProduct from './components/EditProduct';
+import LoginPromptModal from './components/LoginPromptModal';
+import FeaturedProductsManager from './components/FeaturedProductsManager';
 
 function App() {
   return (
@@ -52,10 +54,19 @@ function App() {
             </AdminRoute>
           }
         />
+        <Route
+          path="/x7k9-featured-products"
+          element={
+            <AdminRoute>
+              <FeaturedProductsManager />
+            </AdminRoute>
+          }
+        />
       </Routes>
       <Footer />
       <ChatWidget />
       <BottomNav />
+      <LoginPromptModal />
     </>
   );
 }

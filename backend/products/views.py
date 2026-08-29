@@ -387,3 +387,31 @@ def edit_product(request, product_id):
 
     serializer = ProductSerializer(product)
     return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def featured_products(request):
+    products = Product.objects.filter(is_featured=True).order_by('featured_order')[:6]
+    serializer = ProductSerializer(products, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def set_featured_products(request):
+    if not request.user.is_staff:
+        return Response({'error': 'Not authorized'}, status=403)
+
+    product_ids = request.data.get('product_ids', [])
+
+    if len(product_ids) > 6:
+        return Response({'error': 'Max 6 products allowed'}, status=400)
+
+    Product.objects.filter(is_featured=True).update(is_featured=False, featured_order=None)
+
+    for index, product_id in enumerate(product_ids):
+        Product.objects.filter(id=product_id).update(is_featured=True, featured_order=index + 1)
+
+    products = Product.objects.filter(is_featured=True).order_by('featured_order')
+    serializer = ProductSerializer(products, many=True)
+    return Response(serializer.data)

@@ -1,0 +1,65 @@
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+
+function HeroBanner({ fallbackProduct }) {
+  const [slides, setSlides] = useState([]);
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_URL}/products/featured/`)
+      .then((response) => response.json())
+      .then((data) => setSlides(Array.isArray(data) ? data : []));
+  }, []);
+
+  const activeSlides = slides.length > 0 ? slides : fallbackProduct ? [fallbackProduct] : [];
+
+  useEffect(() => {
+    if (activeSlides.length <= 1) return;
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % activeSlides.length);
+    }, 3500);
+    return () => clearInterval(timer);
+  }, [activeSlides.length]);
+
+  if (activeSlides.length === 0) return null;
+
+  const current = activeSlides[index % activeSlides.length];
+  const img = current.images?.find((im) => im.is_primary) || current.images?.[0];
+
+  return (
+    <Link
+      to={`/products/${current.id}`}
+      className="col-span-2 row-span-2 relative rounded-2xl overflow-hidden group block"
+    >
+      {img && (
+        <img
+          key={current.id}
+          src={img.image}
+          alt={current.name}
+          className="w-full h-full object-cover min-h-[220px] animate-fade-in-up"
+        />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 p-4">
+        <span className="bg-[#FF3F6C] text-white text-[10px] font-bold uppercase px-2 py-1 rounded">
+          Featured
+        </span>
+        <h3 className="text-white font-bold text-lg mt-1">{current.name}</h3>
+        <p className="text-white/90 text-sm">₹{current.price}</p>
+      </div>
+
+      {activeSlides.length > 1 && (
+        <div className="absolute top-3 right-3 flex gap-1">
+          {activeSlides.map((_, i) => (
+            <span
+              key={i}
+              className={`w-1.5 h-1.5 rounded-full ${i === index ? 'bg-white' : 'bg-white/40'}`}
+            />
+          ))}
+        </div>
+      )}
+    </Link>
+  );
+}
+
+export default HeroBanner;

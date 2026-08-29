@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import HeroBanner from './HeroBanner';
 
 function HomeSuggestions({ products }) {
   const featured = [...products]
@@ -8,34 +9,14 @@ function HomeSuggestions({ products }) {
   if (featured.length === 0) return null;
 
   const [big, ...rest] = featured;
-  const bigImage = big.images.find((img) => img.is_primary) || big.images[0];
 
   return (
     <div className="max-w-7xl mx-auto">
       <h2 className="text-lg font-bold text-[#282C3F] mb-4">Curated For You</h2>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {/* Big featured tile */}
-        <Link
-          to={`/products/${big.id}`}
-          className="col-span-2 row-span-2 relative rounded-2xl overflow-hidden group"
-        >
-          {bigImage && (
-            <img
-              src={bigImage.image}
-              alt={big.name}
-              className="w-full h-full object-cover min-h-[220px] group-hover:scale-105 transition-transform duration-500"
-            />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-4">
-            <span className="bg-[#FF3F6C] text-white text-[10px] font-bold uppercase px-2 py-1 rounded">
-              Featured
-            </span>
-            <h3 className="text-white font-bold text-lg mt-1">{big.name}</h3>
-            <p className="text-white/90 text-sm">₹{big.price}</p>
-          </div>
-        </Link>
+        {/* Big featured tile - auto swipes through admin-selected products */}
+        <HeroBanner fallbackProduct={big} />
 
         {/* Small tiles */}
         {rest.map((product, i) => {

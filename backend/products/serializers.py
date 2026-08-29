@@ -96,6 +96,11 @@ class ProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True, read_only=True)
     category_name = serializers.CharField(source='category.name', read_only=True)
     reviews = ReviewSerializer(many=True, read_only=True)
+    fields = [
+        'id', 'name', 'description', 'price', 'stock',
+        'category', 'category_name', 'images', 'reviews', 'created_at',
+        'is_featured', 'featured_order'
+    ]
 
     class Meta:
         model = Product

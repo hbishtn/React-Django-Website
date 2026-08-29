@@ -26,6 +26,8 @@ class Product(models.Model):
     color_group = models.CharField(max_length=100, blank=True, null=True)
     color_name = models.CharField(max_length=50, blank=True, null=True)
     color_hex = models.CharField(max_length=7, blank=True, null=True)
+    is_featured = models.BooleanField(default=False)
+    featured_order = models.PositiveSmallIntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.name

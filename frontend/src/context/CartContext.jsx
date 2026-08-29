@@ -5,6 +5,7 @@ const CartContext = createContext();
 
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const { token } = useAuth();
 
   const fetchCart = () => {
@@ -25,6 +26,11 @@ export function CartProvider({ children }) {
   }, [token]);
 
   const addToCart = (product) => {
+    if (!token) {
+      setShowLoginPrompt(true);
+      return;
+    }
+
     fetch(`${import.meta.env.VITE_API_URL}/cart/add/`, {
       method: 'POST',
       headers: {
@@ -60,7 +66,7 @@ export function CartProvider({ children }) {
   };
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, clearCart, fetchCart }}>
+    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, clearCart, fetchCart, showLoginPrompt, setShowLoginPrompt }}>
       {children}
     </CartContext.Provider>
   );

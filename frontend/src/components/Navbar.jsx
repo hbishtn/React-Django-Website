@@ -80,12 +80,11 @@ function Navbar() {
           {username ? (
             <UserDropdown />
           ) : (
-            <Link to="/login" className="flex items-center gap-1.5 text-sm hover:text-[#FF3F6C] whitespace-nowrap">
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-              <span className="hidden sm:inline">{t('login')}</span>
+            <Link
+              to="/login"
+              className="text-sm font-bold text-[#FF3F6C] whitespace-nowrap px-3 py-1.5 rounded-full animate-glow"
+            >
+              {t('login')}
             </Link>
           )}
         </div>

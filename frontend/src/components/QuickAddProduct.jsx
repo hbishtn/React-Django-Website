@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 function QuickAddProduct() {
   const { token } = useAuth();
@@ -217,7 +218,14 @@ function QuickAddProduct() {
   return (
     <div className="min-h-screen bg-[#F5F5F6] p-6">
       <div className="max-w-md mx-auto bg-white rounded-xl shadow-md p-6">
-        <h2 className="text-xl font-bold text-[#282C3F] mb-4">Quick Add Product</h2>
+        <h2 className="text-xl font-bold text-[#282C3F] mb-2">Quick Add Product</h2>
+
+        <Link
+          to="/x7k9-featured-products"
+          className="block text-center text-sm font-semibold text-[#FF3F6C] border border-[#FF3F6C] rounded-lg py-2 mb-4 hover:bg-[#FFF0F4]"
+        >
+          Set Hero Section (Home Page Tiles)
+        </Link>
 
         {!imagePreview && (
           <label className="w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-[#FF3F6C] transition-colors mb-3">

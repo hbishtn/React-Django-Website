@@ -66,3 +66,16 @@ body {
 .animate-fade-in-up {
   animation: fade-in-up 0.4s ease-out forwards;
 }
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(255, 63, 108, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 14px rgba(255, 63, 108, 0.9);
+  }
+}
+
+.animate-glow {
+  animation: glow-pulse 1.8s ease-in-out infinite;
+}
