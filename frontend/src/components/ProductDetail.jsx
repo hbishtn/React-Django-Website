@@ -20,10 +20,11 @@ function ProductDetail() {
   const navigate = useNavigate();
   
   useEffect(() => {
+    window.scrollTo(0, 0);
     fetch(`${import.meta.env.VITE_API_URL}/products/${id}/`)
       .then((response) => response.json())
       .then((data) => setProduct(data));
-  }, [id]);
+}, [id]);
 
   useEffect(() => {
     if (product) {
