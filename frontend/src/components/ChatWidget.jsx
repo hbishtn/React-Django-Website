@@ -8,8 +8,17 @@ const MASCOTS = {
   Moku: { body: '#AB7FE0', dark: '#5E35B1', bell: '#FFE082', bellDark: '#F9A825' },
 };
 
+const ANIM_DELAYS = {
+  Tingu: { eyes: '0s', mouth: '0.4s' },
+  Pinku: { eyes: '0.6s', mouth: '1.3s' },
+  Lofu: { eyes: '1.2s', mouth: '0.1s' },
+  Chikku: { eyes: '1.8s', mouth: '2.1s' },
+  Moku: { eyes: '2.4s', mouth: '1.6s' },
+};
+
 function MascotIcon({ name, size = 64 }) {
   const c = MASCOTS[name];
+  const delay = ANIM_DELAYS[name] || { eyes: '0s', mouth: '0s' };
   function MascotSVG({ children, size }) {
     return (
         <svg width={size} height={size} viewBox="0 0 64 64">
@@ -32,18 +41,22 @@ function MascotIcon({ name, size = 64 }) {
       <MascotSVG size={size}>
         <circle cx="32" cy="30" r="27" fill={c.body} stroke={c.dark} strokeWidth="1.5" />
         <ellipse cx="32" cy="40" rx="17" ry="15" fill="white" />
-        <circle cx="24" cy="20" r="5" fill="white" />
-        <circle cx="24" cy="21" r="2.2" fill="#1E293B" />
-        <circle cx="25" cy="20" r="0.7" fill="white" />
-        <circle cx="40" cy="20" r="5" fill="white" />
-        <circle cx="40" cy="21" r="2.2" fill="#1E293B" />
-        <circle cx="41" cy="20" r="0.7" fill="white" />
+        <g className="mascot-eyes" style={{ animationDelay: delay.eyes }}>
+          <circle cx="24" cy="20" r="5" fill="white" />
+          <circle cx="24" cy="21" r="2.2" fill="#1E293B" />
+          <circle cx="25" cy="20" r="0.7" fill="white" />
+          <circle cx="40" cy="20" r="5" fill="white" />
+          <circle cx="40" cy="21" r="2.2" fill="#1E293B" />
+          <circle cx="41" cy="20" r="0.7" fill="white" />
+        </g>
         <circle cx="32" cy="30" r="3" fill="#D32F2F" />
         <line x1="10" y1="26" x2="22" y2="27" stroke="#1E293B" strokeWidth="1" />
         <line x1="10" y1="31" x2="22" y2="31" stroke="#1E293B" strokeWidth="1" />
         <line x1="42" y1="27" x2="54" y2="26" stroke="#1E293B" strokeWidth="1" />
         <line x1="42" y1="31" x2="54" y2="31" stroke="#1E293B" strokeWidth="1" />
-        <path d="M22 34 Q32 42 42 34" stroke="#1E293B" strokeWidth="2" fill="none" strokeLinecap="round" />
+        <g className="mascot-mouth mascot-mouth-tingu" style={{ animationDelay: delay.mouth }}>
+          <path d="M22 34 Q32 42 42 34" stroke="#1E293B" strokeWidth="2" fill="none" strokeLinecap="round" />
+        </g>
         <circle cx="32" cy="47" r="4" fill={c.bell} stroke={c.bellDark} strokeWidth="1" />
         <line x1="24" y1="47" x2="40" y2="47" stroke={c.bellDark} strokeWidth="1" />
       </MascotSVG>
@@ -55,12 +68,16 @@ function MascotIcon({ name, size = 64 }) {
       <MascotSVG size={size}>
         <circle cx="32" cy="30" r="27" fill={c.body} stroke={c.dark} strokeWidth="1.5" />
         <ellipse cx="32" cy="40" rx="17" ry="15" fill="white" />
-        <path d="M18 20 Q24 16 30 20" stroke="#1E293B" strokeWidth="2.2" fill="none" strokeLinecap="round" />
-        <path d="M34 20 Q40 16 46 20" stroke="#1E293B" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+        <g className="mascot-eyes" style={{ animationDelay: delay.eyes }}>
+          <path d="M18 20 Q24 16 30 20" stroke="#1E293B" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+          <path d="M34 20 Q40 16 46 20" stroke="#1E293B" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+        </g>
         <circle cx="18" cy="27" r="4" fill="#FFAFC5" opacity="0.7" />
         <circle cx="46" cy="27" r="4" fill="#FFAFC5" opacity="0.7" />
         <circle cx="32" cy="30" r="2.5" fill="#D32F2F" />
-        <path d="M27 37 Q32 40 37 37" stroke="#1E293B" strokeWidth="2" fill="none" strokeLinecap="round" />
+        <g className="mascot-mouth mascot-mouth-pinku" style={{ animationDelay: delay.mouth }}>
+          <path d="M27 37 Q32 40 37 37" stroke="#1E293B" strokeWidth="2" fill="none" strokeLinecap="round" />
+        </g>
         <circle cx="32" cy="47" r="4" fill={c.bell} stroke={c.bellDark} strokeWidth="1" />
         <line x1="24" y1="47" x2="40" y2="47" stroke={c.bellDark} strokeWidth="1" />
       </MascotSVG>
@@ -72,12 +89,16 @@ function MascotIcon({ name, size = 64 }) {
       <MascotSVG size={size}>
         <circle cx="32" cy="30" r="27" fill={c.body} stroke={c.dark} strokeWidth="1.5" />
         <ellipse cx="32" cy="40" rx="17" ry="15" fill="white" />
-        <path d="M19 20 Q24 15 29 20" stroke="#1E293B" strokeWidth="2.2" fill="none" strokeLinecap="round" />
-        <circle cx="41" cy="20" r="5" fill="white" />
-        <circle cx="41" cy="21" r="2.2" fill="#1E293B" />
-        <circle cx="42" cy="20" r="0.7" fill="white" />
+        <g className="mascot-eyes" style={{ animationDelay: delay.eyes }}>
+          <path d="M19 20 Q24 15 29 20" stroke="#1E293B" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+          <circle cx="41" cy="20" r="5" fill="white" />
+          <circle cx="41" cy="21" r="2.2" fill="#1E293B" />
+          <circle cx="42" cy="20" r="0.7" fill="white" />
+        </g>
         <circle cx="30" cy="30" r="2.8" fill="#D32F2F" />
-        <path d="M20 35 Q32 46 46 33" stroke="#1E293B" strokeWidth="2.3" fill="none" strokeLinecap="round" />
+        <g className="mascot-mouth mascot-mouth-lofu" style={{ animationDelay: delay.mouth }}>
+          <path d="M20 35 Q32 46 46 33" stroke="#1E293B" strokeWidth="2.3" fill="none" strokeLinecap="round" />
+        </g>
         <circle cx="32" cy="47" r="4" fill={c.bell} stroke={c.bellDark} strokeWidth="1" />
         <line x1="24" y1="47" x2="40" y2="47" stroke={c.bellDark} strokeWidth="1" />
       </MascotSVG>
@@ -91,10 +112,14 @@ function MascotIcon({ name, size = 64 }) {
         <ellipse cx="32" cy="40" rx="17" ry="15" fill="white" />
         <path d="M32 3 Q36 -2 40 3" stroke={c.dark} strokeWidth="2" fill="none" strokeLinecap="round" />
         <circle cx="40" cy="2" r="2" fill={c.body} stroke={c.dark} strokeWidth="1" />
-        <ellipse cx="24" cy="22" rx="5" ry="2.5" fill="#1E293B" />
-        <ellipse cx="40" cy="22" rx="5" ry="2.5" fill="#1E293B" />
+        <g className="mascot-eyes" style={{ animationDelay: delay.eyes }}>
+          <ellipse cx="24" cy="22" rx="5" ry="2.5" fill="#1E293B" />
+          <ellipse cx="40" cy="22" rx="5" ry="2.5" fill="#1E293B" />
+        </g>
         <circle cx="32" cy="30" r="2.5" fill="#D32F2F" />
-        <line x1="27" y1="38" x2="37" y2="38" stroke="#1E293B" strokeWidth="2" strokeLinecap="round" />
+        <g className="mascot-mouth mascot-mouth-chikku" style={{ animationDelay: delay.mouth }}>
+          <line x1="27" y1="38" x2="37" y2="38" stroke="#1E293B" strokeWidth="2" strokeLinecap="round" />
+        </g>
         <circle cx="32" cy="47" r="4" fill={c.bell} stroke={c.bellDark} strokeWidth="1" />
         <line x1="24" y1="47" x2="40" y2="47" stroke={c.bellDark} strokeWidth="1" />
       </MascotSVG>
@@ -111,10 +136,14 @@ function MascotIcon({ name, size = 64 }) {
         <circle cx="44" cy="10" r="1.2" fill="white" opacity="0.6" />
         <line x1="19" y1="19" x2="27" y2="22" stroke="#1E293B" strokeWidth="2" strokeLinecap="round" />
         <line x1="45" y1="19" x2="37" y2="22" stroke="#1E293B" strokeWidth="2" strokeLinecap="round" />
-        <ellipse cx="24" cy="26" rx="3.5" ry="2" fill="#1E293B" />
-        <ellipse cx="40" cy="26" rx="3.5" ry="2" fill="#1E293B" />
+        <g className="mascot-eyes" style={{ animationDelay: delay.eyes }}>
+          <ellipse cx="24" cy="26" rx="3.5" ry="2" fill="#1E293B" />
+          <ellipse cx="40" cy="26" rx="3.5" ry="2" fill="#1E293B" />
+        </g>
         <circle cx="32" cy="30" r="2.5" fill="#D32F2F" />
-        <line x1="26" y1="38" x2="38" y2="38" stroke="#1E293B" strokeWidth="2" strokeLinecap="round" />
+        <g className="mascot-mouth mascot-mouth-moku" style={{ animationDelay: delay.mouth }}>
+          <line x1="26" y1="38" x2="38" y2="38" stroke="#1E293B" strokeWidth="2" strokeLinecap="round" />
+        </g>
         <circle cx="32" cy="47" r="4" fill={c.bell} stroke={c.bellDark} strokeWidth="1" />
         <line x1="24" y1="47" x2="40" y2="47" stroke={c.bellDark} strokeWidth="1" />
       </MascotSVG>
