@@ -14,7 +14,7 @@ function HomeSuggestions({ products }) {
     <div className="max-w-7xl mx-auto">
       <h2 className="text-lg font-bold text-[#282C3F] mb-4">Curated For You</h2>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4" style={{ gridAutoRows: '150px' }}>
         {/* Big featured tile - auto swipes through admin-selected products */}
         <HeroBanner fallbackProduct={big} />
 
@@ -25,7 +25,7 @@ function HomeSuggestions({ products }) {
             <Link
               key={product.id}
               to={`/products/${product.id}`}
-              className="relative rounded-2xl overflow-hidden group aspect-square"
+              className="relative rounded-2xl overflow-hidden group"
             >
               {img && (
                 <img

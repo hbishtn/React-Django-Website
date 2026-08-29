@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 function HeroBanner({ fallbackProduct }) {
   const [slides, setSlides] = useState([]);
   const [index, setIndex] = useState(0);
+  const [direction, setDirection] = useState(1);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/products/featured/`)
@@ -16,6 +17,7 @@ function HeroBanner({ fallbackProduct }) {
   useEffect(() => {
     if (activeSlides.length <= 1) return;
     const timer = setInterval(() => {
+      setDirection(1);
       setIndex((prev) => (prev + 1) % activeSlides.length);
     }, 3500);
     return () => clearInterval(timer);
@@ -29,12 +31,14 @@ function HeroBanner({ fallbackProduct }) {
   const goPrev = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    setDirection(-1);
     setIndex((prev) => (prev - 1 + activeSlides.length) % activeSlides.length);
   };
 
   const goNext = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    setDirection(1);
     setIndex((prev) => (prev + 1) % activeSlides.length);
   };
 
@@ -48,7 +52,7 @@ function HeroBanner({ fallbackProduct }) {
           key={current.id}
           src={img.image}
           alt={current.name}
-          className="w-full h-full object-cover min-h-[220px] animate-fade-in-up"
+          className={`w-full h-full object-cover ${direction === 1 ? 'animate-slide-right' : 'animate-slide-left'}`}
         />
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
@@ -96,5 +100,4 @@ function HeroBanner({ fallbackProduct }) {
     </Link>
   );
 }
-
 export default HeroBanner;
