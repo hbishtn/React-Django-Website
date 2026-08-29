@@ -99,6 +99,12 @@ function ProductList() {
   const selectedCategoryObj = categories.find((cat) => cat.id === selectedCategory);
   const isNailPaintCategory = selectedCategoryObj?.slug === 'nail-paint';
 
+  const sortedCategories = [...categories].sort((a, b) => {
+    const countA = products.filter((p) => p.category === a.id).length;
+    const countB = products.filter((p) => p.category === b.id).length;
+    return countB - countA;
+  });
+
   return (
     <div className="min-h-screen bg-[#F5F5F6] p-6">
       {searchQuery && (
@@ -109,7 +115,7 @@ function ProductList() {
 
       <div className="sticky top-0 z-30 bg-[#F5F5F6] pt-2 pb-2 -mx-6 px-3">
         <CategoryTiles
-          categories={categories}
+          categories={sortedCategories}
           selectedCategory={selectedCategory}
           onSelect={handleCategorySelect}
           t={t}
