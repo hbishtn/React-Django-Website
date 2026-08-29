@@ -12,6 +12,9 @@ const CATEGORY_GROUPS = {
   jewelry: ['jewelry', 'mangalsutra', 'earrings', 'jhumka', 'nath'],
 };
 
+let cachedProducts = null;
+let cachedCategories = null;
+
 function seededShuffle(array, seed) {
   const shuffled = [...array];
   let random = seed;
@@ -34,9 +37,9 @@ function getTimeSeed() {
 }
 
 function ProductList() {
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState(cachedProducts || []);
+  const [categories, setCategories] = useState(cachedCategories || []);
+  const [loading, setLoading] = useState(!cachedProducts);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('search') || '';
@@ -44,15 +47,27 @@ function ProductList() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (cachedProducts && cachedCategories) {
+      return;
+    }
+
     fetch(`${import.meta.env.VITE_API_URL}/products/?page_size=100`)
       .then((response) => response.json())
-      .then((data) => setProducts(data.results || data))
+      .then((data) => {
+        const list = data.results || data;
+        cachedProducts = list;
+        setProducts(list);
+      })
       .finally(() => setLoading(false));
 
     fetch(`${import.meta.env.VITE_API_URL}/categories/?page_size=100`)
       .then((response) => response.json())
-      .then((data) => setCategories(data.results || data));
-  }, []);
+      .then((data) => {
+        const list = data.results || data;
+        cachedCategories = list;
+        setCategories(list);
+      });
+}, []);
 
   useEffect(() => {
     const categorySlug = searchParams.get('category');
