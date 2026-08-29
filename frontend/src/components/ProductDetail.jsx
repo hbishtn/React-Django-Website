@@ -70,7 +70,7 @@ function ProductDetail() {
   };
 
   if (!product) {
-    return <LoadingScreen message="Product load ho raha hai..." />;
+    return <LoadingScreen message="Wait please..." />;
 }
 
   return (
