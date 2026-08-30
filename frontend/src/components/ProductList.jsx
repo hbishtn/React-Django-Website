@@ -13,6 +13,10 @@ const CATEGORY_GROUPS = {
   jewelry: ['jewelry', 'mangalsutra', 'earrings', 'jhumka', 'nath'],
 };
 
+let cachedProducts = null;
+let cachedCategories = null;
+let filteredCache = {};
+
 function seededShuffle(array, seed) {
   const shuffled = [...array];
   let random = seed;
@@ -35,9 +39,9 @@ function getTimeSeed() {
 }
 
 function ProductList() {
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState(cachedProducts || []);
+  const [categories, setCategories] = useState(cachedCategories || []);
+  const [loading, setLoading] = useState(!cachedProducts);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [filterLoading, setFilterLoading] = useState(false);
@@ -48,14 +52,26 @@ function ProductList() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (cachedProducts && cachedCategories) {
+      return;
+    }
+
     fetch(`${import.meta.env.VITE_API_URL}/products/?page_size=100`)
       .then((response) => response.json())
-      .then((data) => setProducts(data.results || data))
+      .then((data) => {
+        const list = data.results || data;
+        cachedProducts = list;
+        setProducts(list);
+      })
       .finally(() => setLoading(false));
 
     fetch(`${import.meta.env.VITE_API_URL}/categories/?page_size=100`)
       .then((response) => response.json())
-      .then((data) => setCategories(data.results || data));
+      .then((data) => {
+        const list = data.results || data;
+        cachedCategories = list;
+        setCategories(list);
+      });
   }, []);
 
   useEffect(() => {
@@ -80,7 +96,16 @@ function ProductList() {
       return;
     }
 
-    setFilterLoading(true);
+    const cacheKey = `${categorySlug || ''}|${searchQuery || ''}`;
+
+    if (filteredCache[cacheKey]) {
+      // Purana cached data turant dikhao, background mein fresh data bhi le aayenge
+      setFilteredProducts(filteredCache[cacheKey]);
+      setFilterLoading(false);
+    } else {
+      setFilterLoading(true);
+    }
+
     const params = new URLSearchParams();
     params.set('page_size', '300');
 
@@ -101,6 +126,7 @@ function ProductList() {
         if (categorySlug === 'jewelry') {
           results = seededShuffle(results, getTimeSeed());
         }
+        filteredCache[cacheKey] = results;
         setFilteredProducts(results);
       })
       .finally(() => setFilterLoading(false));
