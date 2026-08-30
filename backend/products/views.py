@@ -113,6 +113,20 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
+    def get_queryset(self):
+        queryset = Product.objects.all().order_by('-created_at')
+
+        category_param = self.request.query_params.get('category')
+        if category_param:
+            slugs = [s.strip() for s in category_param.split(',') if s.strip()]
+            queryset = queryset.filter(category__slug__in=slugs)
+
+        search_param = self.request.query_params.get('search')
+        if search_param:
+            queryset = queryset.filter(name__icontains=search_param)
+
+        return queryset
+
 
 @api_view(['POST'])
 @permission_classes([AllowAny])

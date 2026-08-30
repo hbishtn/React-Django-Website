@@ -7,13 +7,11 @@ import NailPaintPicker from './NailPaintPicker';
 import HomeSuggestions from './HomeSuggestions';
 import ProductCardSkeleton from './ProductCardSkeleton';
 
+
 const CATEGORY_GROUPS = {
   cloth: ['cloth', 'kurti', 'plazo'],
   jewelry: ['jewelry', 'mangalsutra', 'earrings', 'jhumka', 'nath'],
 };
-
-let cachedProducts = null;
-let cachedCategories = null;
 
 function seededShuffle(array, seed) {
   const shuffled = [...array];
@@ -37,40 +35,30 @@ function getTimeSeed() {
 }
 
 function ProductList() {
-  const [products, setProducts] = useState(cachedProducts || []);
-  const [categories, setCategories] = useState(cachedCategories || []);
-  const [loading, setLoading] = useState(!cachedProducts);
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [filterLoading, setFilterLoading] = useState(false);
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('search') || '';
+  const categorySlug = searchParams.get('category');
   const { t } = useLanguage();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (cachedProducts && cachedCategories) {
-      return;
-    }
-
     fetch(`${import.meta.env.VITE_API_URL}/products/?page_size=100`)
       .then((response) => response.json())
-      .then((data) => {
-        const list = data.results || data;
-        cachedProducts = list;
-        setProducts(list);
-      })
+      .then((data) => setProducts(data.results || data))
       .finally(() => setLoading(false));
 
     fetch(`${import.meta.env.VITE_API_URL}/categories/?page_size=100`)
       .then((response) => response.json())
-      .then((data) => {
-        const list = data.results || data;
-        cachedCategories = list;
-        setCategories(list);
-      });
-}, []);
+      .then((data) => setCategories(data.results || data));
+  }, []);
 
   useEffect(() => {
-    const categorySlug = searchParams.get('category');
     if (categorySlug && categories.length > 0) {
       const matchedCategory = categories.find((cat) => cat.slug === categorySlug);
       if (matchedCategory) {
@@ -79,7 +67,44 @@ function ProductList() {
     } else {
       setSelectedCategory(null);
     }
-  }, [searchParams, categories]);
+  }, [categorySlug, categories]);
+
+  // Category ya search select hone par, backend se hi poora fresh data maango
+  // (already-loaded products mein se filter nahi karte, taaki 100 se zyada
+  // products wali category (jaise 120 jewelry) bhi poori dikhe)
+  useEffect(() => {
+    const group = CATEGORY_GROUPS[categorySlug];
+
+    if (!categorySlug && !searchQuery) {
+      setFilteredProducts([]);
+      return;
+    }
+
+    setFilterLoading(true);
+    const params = new URLSearchParams();
+    params.set('page_size', '300');
+
+    if (group) {
+      params.set('category', group.join(','));
+    } else if (categorySlug) {
+      params.set('category', categorySlug);
+    }
+
+    if (searchQuery) {
+      params.set('search', searchQuery);
+    }
+
+    fetch(`${import.meta.env.VITE_API_URL}/products/?${params.toString()}`)
+      .then((response) => response.json())
+      .then((data) => {
+        let results = data.results || data;
+        if (categorySlug === 'jewelry') {
+          results = seededShuffle(results, getTimeSeed());
+        }
+        setFilteredProducts(results);
+      })
+      .finally(() => setFilterLoading(false));
+  }, [categorySlug, searchQuery]);
 
   const handleCategorySelect = (categoryId) => {
     const category = categories.find((cat) => cat.id === categoryId);
@@ -90,29 +115,9 @@ function ProductList() {
     }
   };
 
-  const categorySlug = searchParams.get('category');
-  const group = CATEGORY_GROUPS[categorySlug];
-
-  let filteredProducts = products;
-
-  if (group) {
-    const groupCategoryIds = categories
-      .filter((cat) => group.includes(cat.slug))
-      .map((cat) => cat.id);
-    const groupProducts = products.filter((product) => groupCategoryIds.includes(product.category));
-    filteredProducts = categorySlug === 'jewelry' ? seededShuffle(groupProducts, getTimeSeed()) : groupProducts;
-  } else if (selectedCategory) {
-    filteredProducts = products.filter((product) => product.category === selectedCategory);
-  }
-
-  if (searchQuery) {
-    filteredProducts = filteredProducts.filter((product) =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }
-
   const selectedCategoryObj = categories.find((cat) => cat.id === selectedCategory);
   const isNailPaintCategory = selectedCategoryObj?.slug === 'nail-paint';
+  const isActiveFilter = !!categorySlug || !!searchQuery;
 
   const sortedCategories = [...categories].sort((a, b) => {
     const countA = products.filter((p) => p.category === a.id).length;
@@ -145,8 +150,14 @@ function ProductList() {
         </div>
       ) : isNailPaintCategory ? (
         <NailPaintPicker />
-      ) : selectedCategory === null && !searchQuery ? (
+      ) : !isActiveFilter ? (
         <HomeSuggestions products={products} />
+      ) : filterLoading ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 max-w-7xl mx-auto">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <ProductCardSkeleton key={i} />
+          ))}
+        </div>
       ) : filteredProducts.length === 0 ? (
         <p className="text-center text-gray-500 mt-10">No products found.</p>
       ) : (
