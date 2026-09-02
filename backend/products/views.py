@@ -127,6 +127,15 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
 
         return queryset
 
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def health_check(request):
+    # Database ko bhi chhoo lete hain, taaki cron-ping se Render aur Neon
+    # dono active/warm rahein, na ki sirf backend jaage aur DB phir bhi so raha ho
+    product_count = Product.objects.count()
+    return Response({'status': 'ok', 'products': product_count})
+
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
