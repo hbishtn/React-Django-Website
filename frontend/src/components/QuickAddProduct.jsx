@@ -33,20 +33,32 @@ function QuickAddProduct() {
     const file = e.target.files[0];
     if (!file) return;
 
-    const compressed = await compressImage(file);
-    setImage(compressed);
-    setImagePreview(URL.createObjectURL(compressed));
-    setName('');
-    setDescription('');
+    setMessage('');
+    try {
+      const compressed = await compressImage(file);
+      setImage(compressed);
+      setImagePreview(URL.createObjectURL(compressed));
+      setName('');
+      setDescription('');
+    } catch (err) {
+      console.error('Image compress failed:', err);
+      setMessage('Yeh photo process nahi ho payi. Kripya doosri photo try karo.');
+    }
     };
 
   const handleSecondImageSelect = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const compressed = await compressImage(file);
-    setSecondImage(compressed);
-    setSecondImagePreview(URL.createObjectURL(compressed));
+    setMessage('');
+    try {
+      const compressed = await compressImage(file);
+      setSecondImage(compressed);
+      setSecondImagePreview(URL.createObjectURL(compressed));
+    } catch (err) {
+      console.error('Image compress failed:', err);
+      setMessage('Yeh photo process nahi ho payi. Kripya doosri photo try karo.');
+    }
     };
 
   const removeMainImage = () => {
@@ -63,32 +75,86 @@ function QuickAddProduct() {
     setSecondImagePreview(null);
   };
 
-  const compressImage = (file) => {
-    return new Promise((resolve) => {
+  const compressImage = (file, maxWidth = 800, quality = 0.7) => {
+    // Fast, memory-safe path: createImageBitmap lets the browser downscale
+    // WHILE decoding, so a huge (e.g. 48MP/108MP) camera photo never has to
+    // sit in memory at full resolution. This is what was silently failing
+    // (or hanging) on large photos with the old FileReader+<img> approach.
+    if (typeof createImageBitmap === 'function') {
+      return (async () => {
+        try {
+          const original = await createImageBitmap(file);
+          const scale = Math.min(1, maxWidth / original.width);
+          const targetWidth = Math.round(original.width * scale);
+          const targetHeight = Math.round(original.height * scale);
+
+          let resizedBitmap = original;
+          if (scale < 1) {
+            resizedBitmap = await createImageBitmap(original, {
+              resizeWidth: targetWidth,
+              resizeHeight: targetHeight,
+              resizeQuality: 'high',
+            });
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = targetWidth;
+          canvas.height = targetHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(resizedBitmap, 0, 0, targetWidth, targetHeight);
+
+          original.close();
+          if (resizedBitmap !== original) resizedBitmap.close();
+
+          const blob = await new Promise((resolve, reject) => {
+            canvas.toBlob(
+              (b) => (b ? resolve(b) : reject(new Error('compress-failed'))),
+              'image/jpeg',
+              quality
+            );
+          });
+
+          return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' });
+        } catch (err) {
+          console.warn('Fast compress path failed, falling back:', err);
+          return compressImageLegacy(file, maxWidth, quality);
+        }
+      })();
+    }
+
+    return compressImageLegacy(file, maxWidth, quality);
+  };
+
+  // Fallback for older browsers (or if the fast path throws). Same logic as
+  // before, but now properly rejects on failure instead of hanging forever.
+  const compressImageLegacy = (file, maxWidth, quality) => {
+    return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
             const canvas = document.createElement('canvas');
-            const maxWidth = 800;
             const scale = Math.min(1, maxWidth / img.width);
-            canvas.width = img.width * scale;
-            canvas.height = img.height * scale;
+            canvas.width = Math.round(img.width * scale);
+            canvas.height = Math.round(img.height * scale);
 
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
             canvas.toBlob(
             (blob) => {
+                if (!blob) { reject(new Error('compress-failed')); return; }
                 const compressedFile = new File([blob], file.name, { type: 'image/jpeg' });
                 resolve(compressedFile);
             },
             'image/jpeg',
-            0.7
+            quality
             );
         };
+        img.onerror = () => reject(new Error('image-decode-failed'));
         img.src = e.target.result;
         };
+        reader.onerror = () => reject(new Error('file-read-failed'));
         reader.readAsDataURL(file);
     });
     };
