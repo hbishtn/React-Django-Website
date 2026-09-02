@@ -114,7 +114,7 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ProductSerializer
 
     def get_queryset(self):
-        queryset = Product.objects.all().order_by('-created_at')
+        queryset = Product.objects.select_related('category').prefetch_related('images', 'reviews').order_by('-created_at')
 
         category_param = self.request.query_params.get('category')
         if category_param:
