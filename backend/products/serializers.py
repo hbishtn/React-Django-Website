@@ -9,7 +9,18 @@ class ProductImageSerializer(serializers.ModelSerializer):
         fields = ['id', 'image', 'is_primary']
 
 
-class ProductSerializer(serializers.ModelSerializer):
+class ReviewSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username', read_only=True)
+
+    class Meta:
+        model = Review
+        fields = ['id', 'username', 'rating', 'comment', 'created_at']
+
+
+# Grid/list views (product list, cart, featured products) — reviews chhod dete hain
+# yahan, kyunki wahan sirf card dikhana hai, poori review list nahi chahiye.
+# Isse category switch karte waqt response bahut halka aur fast rehta hai.
+class ProductListSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True, read_only=True)
     category_name = serializers.CharField(source='category.name', read_only=True)
 
@@ -17,8 +28,23 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = [
             'id', 'name', 'description', 'price', 'stock',
-            'category', 'category_name', 'images', 'color_group', 'color_name', 'color_hex', 'created_at'
+            'category', 'category_name', 'images', 'created_at',
+            'color_group', 'color_name', 'color_hex',
+            'is_featured', 'featured_order',
         ]
+
+
+# Single product page ke liye — yahan reviews bhi chahiye.
+class ProductDetailSerializer(ProductListSerializer):
+    reviews = ReviewSerializer(many=True, read_only=True)
+
+    class Meta(ProductListSerializer.Meta):
+        fields = ProductListSerializer.Meta.fields + ['reviews']
+
+
+# Purane naam se import karne wali jagahon ke liye backward-compatible alias,
+# taaki kahin bhi import error na aaye.
+ProductSerializer = ProductDetailSerializer
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -70,7 +96,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class CartItemSerializer(serializers.ModelSerializer):
-    product_detail = ProductSerializer(source='product', read_only=True)
+    product_detail = ProductListSerializer(source='product', read_only=True)
 
     class Meta:
         model = CartItem
@@ -83,23 +109,3 @@ class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = ['id', 'items']
-
-class ReviewSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username', read_only=True)
-
-    class Meta:
-        model = Review
-        fields = ['id', 'username', 'rating', 'comment', 'created_at']
-
-class ProductSerializer(serializers.ModelSerializer):
-    images = ProductImageSerializer(many=True, read_only=True)
-    category_name = serializers.CharField(source='category.name', read_only=True)
-    reviews = ReviewSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Product
-        fields = [
-            'id', 'name', 'description', 'price', 'stock',
-            'category', 'category_name', 'images', 'reviews', 'created_at',
-            'is_featured', 'featured_order'
-        ]

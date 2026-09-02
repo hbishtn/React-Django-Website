@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from django.db.models import Q
 from .models import Category, Product, Order, Cart, CartItem, ProductImage
-from .serializers import CategorySerializer, ProductSerializer, RegisterSerializer, OrderSerializer, CartSerializer, ReviewSerializer
+from .serializers import CategorySerializer, ProductListSerializer, ProductDetailSerializer, RegisterSerializer, OrderSerializer, CartSerializer, ReviewSerializer
 from rest_framework.permissions import IsAuthenticated
 from groq import Groq
 from decouple import config
@@ -111,10 +111,23 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
 
 class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Product.objects.all()
-    serializer_class = ProductSerializer
+    serializer_class = ProductDetailSerializer
+
+    def get_serializer_class(self):
+        # List (grid/category browse) mein reviews ki zaroorat nahi — halka serializer
+        # use karte hain taaki category switch karte waqt response jaldi aaye.
+        # Single product (retrieve) mein poora data (reviews samet) chahiye.
+        if self.action == 'list':
+            return ProductListSerializer
+        return ProductDetailSerializer
 
     def get_queryset(self):
-        queryset = Product.objects.select_related('category').prefetch_related('images', 'reviews').order_by('-created_at')
+        queryset = Product.objects.select_related('category').order_by('-created_at')
+
+        if self.action != 'list':
+            queryset = queryset.prefetch_related('images', 'reviews')
+        else:
+            queryset = queryset.prefetch_related('images')
 
         category_param = self.request.query_params.get('category')
         if category_param:
@@ -215,6 +228,7 @@ def clear_cart_view(request):
     cart.items.all().delete()
     serializer = CartSerializer(cart)
     return Response(serializer.data)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -329,7 +343,7 @@ def quick_add_product(request):
     if second_image_file:
         ProductImage.objects.create(product=product, image=second_image_file, is_primary=False)
 
-    serializer = ProductSerializer(product)
+    serializer = ProductDetailSerializer(product)
     return Response(serializer.data)
 
 @api_view(['POST'])
@@ -408,14 +422,14 @@ def edit_product(request, product_id):
     if new_image:
         ProductImage.objects.create(product=product, image=new_image, is_primary=False)
 
-    serializer = ProductSerializer(product)
+    serializer = ProductDetailSerializer(product)
     return Response(serializer.data)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def featured_products(request):
     products = Product.objects.filter(is_featured=True).order_by('featured_order')[:6]
-    serializer = ProductSerializer(products, many=True)
+    serializer = ProductListSerializer(products, many=True)
     return Response(serializer.data)
 
 
@@ -436,5 +450,5 @@ def set_featured_products(request):
         Product.objects.filter(id=product_id).update(is_featured=True, featured_order=index + 1)
 
     products = Product.objects.filter(is_featured=True).order_by('featured_order')
-    serializer = ProductSerializer(products, many=True)
+    serializer = ProductListSerializer(products, many=True)
     return Response(serializer.data)
