@@ -3,16 +3,24 @@ import { Link } from 'react-router-dom';
 
 function HeroBanner({ fallbackProduct }) {
   const [slides, setSlides] = useState([]);
+  const [loaded, setLoaded] = useState(false);
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/products/featured/`)
       .then((response) => response.json())
-      .then((data) => setSlides(Array.isArray(data) ? data : []));
+      .then((data) => setSlides(Array.isArray(data) ? data : []))
+      .finally(() => setLoaded(true));
   }, []);
 
-  const activeSlides = slides.length > 0 ? slides : fallbackProduct ? [fallbackProduct] : [];
+  // Jab tak asli featured slides fetch nahi ho jaate, fallbackProduct kabhi
+  // mat dikhao — warna wahi "1 product flash hoke phir 6 tiles aana" wala
+  // jump hota hai. Sirf loaded hone ke baad hi fallback pe jao (agar
+  // genuinely 0 featured products hain).
+  const activeSlides = loaded
+    ? (slides.length > 0 ? slides : fallbackProduct ? [fallbackProduct] : [])
+    : [];
 
   useEffect(() => {
     if (activeSlides.length <= 1) return;
@@ -22,6 +30,14 @@ function HeroBanner({ fallbackProduct }) {
     }, 3500);
     return () => clearInterval(timer);
   }, [activeSlides.length]);
+
+  if (!loaded) {
+    return (
+      <div className="col-span-2 row-span-2 relative rounded-2xl overflow-hidden">
+        <div className="w-full h-full animate-shimmer" />
+      </div>
+    );
+  }
 
   if (activeSlides.length === 0) return null;
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import CategoryTiles from './CategoryTiles';
@@ -88,7 +88,10 @@ function ProductList() {
   // Category ya search select hone par, backend se hi poora fresh data maango
   // (already-loaded products mein se filter nahi karte, taaki 100 se zyada
   // products wali category (jaise 120 jewelry) bhi poori dikhe)
+  const latestFilterRequest = useRef(0);
+
   useEffect(() => {
+    const requestId = ++latestFilterRequest.current;
     const group = CATEGORY_GROUPS[categorySlug];
 
     if (!categorySlug && !searchQuery) {
@@ -122,6 +125,11 @@ function ProductList() {
     fetch(`${import.meta.env.VITE_API_URL}/products/?${params.toString()}`)
       .then((response) => response.json())
       .then((data) => {
+        // Agar iske baad user ne dobara category/search badal di hai, to yeh
+        // purana (stale) response hai — ignore karo, isse hi "purani
+        // category ke products 1 second flash hote hain" wala bug aata tha.
+        if (latestFilterRequest.current !== requestId) return;
+
         let results = data.results || data;
         if (categorySlug === 'jewelry') {
           results = seededShuffle(results, getTimeSeed());
@@ -129,7 +137,11 @@ function ProductList() {
         filteredCache[cacheKey] = results;
         setFilteredProducts(results);
       })
-      .finally(() => setFilterLoading(false));
+      .finally(() => {
+        if (latestFilterRequest.current === requestId) {
+          setFilterLoading(false);
+        }
+      });
   }, [categorySlug, searchQuery]);
 
   const handleCategorySelect = (categoryId) => {
