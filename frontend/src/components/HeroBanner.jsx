@@ -31,13 +31,13 @@ function HeroBanner({ fallbackProduct }) {
     return () => clearInterval(timer);
   }, [activeSlides.length]);
 
-  if (!loaded) {
-    return (
-      <div className="col-span-2 row-span-2 relative rounded-2xl overflow-hidden">
-        <div className="w-full h-full animate-shimmer" />
-      </div>
-    );
-  }
+    if (!loaded) {
+      return (
+        <div className="col-span-2 row-span-2 relative rounded-2xl overflow-hidden border border-gray-200">
+          <div className="w-full h-full hero-shimmer" />
+        </div>
+      );
+    }
 
   if (activeSlides.length === 0) return null;
 

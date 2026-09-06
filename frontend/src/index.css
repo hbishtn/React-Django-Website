@@ -153,6 +153,15 @@ body {
   animation: shimmer 1.4s linear infinite;
 }
 
+/* Hero banner ka skeleton — normal shimmer bahut pale tha aur border na hone ki
+   wajah se page background mein poori tarah blend ho raha tha (safed dikh raha
+   tha). Isliye sirf isi jagah ke liye thoda darker gray use kar rahe hain. */
+.hero-shimmer {
+  background: linear-gradient(90deg, #dcdcdc 0%, #eeeeee 50%, #dcdcdc 100%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
 @keyframes fade-in-up {
   0% {
     opacity: 0;
