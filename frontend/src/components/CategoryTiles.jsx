@@ -111,6 +111,7 @@ function CategoryTiles({ categories, selectedCategory, onSelect, t }) {
                 <img
                   src={category.image}
                   alt={category.name}
+                  loading="lazy"
                   className="w-full h-full object-cover"
                 />
               ) : (

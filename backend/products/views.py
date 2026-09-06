@@ -55,13 +55,13 @@ def chat_view(request):
             Q(color_name__icontains=word)
         )
 
-    if words:
-        products = Product.objects.filter(search_query).distinct().order_by('-created_at')[:30]
-    else:
-        products = Product.objects.none()
+        if words:
+            products = Product.objects.filter(search_query).select_related('category').prefetch_related('images').distinct().order_by('-created_at')[:30]
+        else:
+            products = Product.objects.none()
 
-    if not products.exists():
-        products = Product.objects.all().order_by('-created_at')[:20]
+        if not products.exists():
+            products = Product.objects.select_related('category').prefetch_related('images').all().order_by('-created_at')[:20]
 
     all_categories = ", ".join(Category.objects.values_list('name', flat=True))
 
@@ -86,6 +86,7 @@ def chat_view(request):
                 {"role": "user", "content": user_message},
             ],
             max_tokens=300,
+            timeout=15,
         )
         ai_reply = response.choices[0].message.content
 

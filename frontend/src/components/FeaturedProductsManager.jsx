@@ -102,7 +102,7 @@ function FeaturedProductsManager() {
               >
                 <div className="relative w-10 h-10 shrink-0 rounded-md overflow-hidden bg-[#F5F5F6]">
                   {img && (
-                    <img src={img.image} alt={product.name} className="w-full h-full object-cover" />
+                    <img src={img.image} alt={product.name} loading="lazy" className="w-full h-full object-cover" />
                   )}
                   {isSelected && (
                     <span className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-[#FF3F6C] text-white text-[11px] font-bold flex items-center justify-center">

@@ -37,6 +37,7 @@ function ProductCard({ product, index = 0 }) {
           <img
             src={primaryImage.image}
             alt={product.name}
+            loading="lazy"
             className="w-full h-56 object-cover"
           />
         )}

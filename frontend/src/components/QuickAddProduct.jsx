@@ -448,7 +448,7 @@ function QuickAddProduct() {
               {recentlyAdded.map((p) => (
                 <div key={p.id} className="flex items-center gap-2 bg-[#F5F5F6] rounded-lg p-2">
                   {p.images?.[0] && (
-                    <img src={p.images[0].image} alt={p.name} className="w-8 h-8 rounded object-cover" />
+                    <img src={p.images[0].image} alt={p.name} loading="lazy" className="w-8 h-8 rounded object-cover" />
                   )}
                   <span className="text-xs text-[#282C3F]">{p.name}</span>
                   <span className="text-xs text-[#FF3F6C] ml-auto">₹{p.price}</span>

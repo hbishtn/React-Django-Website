@@ -176,10 +176,16 @@ function ChatWidget() {
     setInput('');
     setLoading(true);
 
+    // 20 second timeout — pehle koi limit nahi thi, isliye agar backend/AI
+    // kabhi slow ho jaata to chat hamesha ke liye "Typing..." pe atka rehta.
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
+
     fetch(`${import.meta.env.VITE_API_URL}/chat/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: input }),
+      signal: controller.signal,
     })
       .then((response) => response.json())
       .then((data) => {
@@ -189,13 +195,21 @@ function ChatWidget() {
         ]);
         setLoading(false);
       })
-      .catch(() => {
+      .catch((err) => {
+        const isTimeout = err.name === 'AbortError';
         setMessages((prev) => [
           ...prev,
-          { role: 'assistant', content: 'Sorry, kuch error aa gaya. Try again.', products: [] },
+          {
+            role: 'assistant',
+            content: isTimeout
+              ? 'Thoda time lag raha hai, dubara try karo.'
+              : 'Sorry, kuch error aa gaya. Try again.',
+            products: [],
+          },
         ]);
         setLoading(false);
-      });
+      })
+      .finally(() => clearTimeout(timeoutId));
   };
 
   return (
@@ -265,7 +279,7 @@ function ChatWidget() {
                         className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg p-1.5 hover:border-[#FF3F6C] transition-colors"
                       >
                         {p.image && (
-                          <img src={p.image} alt={p.name} className="w-10 h-10 rounded object-cover" />
+                          <img src={p.image} alt={p.name} loading="lazy" className="w-10 h-10 rounded object-cover" />
                         )}
                         <div>
                           <p className="text-xs font-medium text-[#282C3F]">{p.name}</p>
