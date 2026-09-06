@@ -297,7 +297,7 @@ def analyze_product_image(request):
                     ]
                 }
             ],
-            max_completion_tokens=1500,
+            max_completion_tokens=300,
             reasoning_effort="none",
             response_format={"type": "json_object"},
         )
