@@ -296,7 +296,9 @@ def analyze_product_image(request):
                     ]
                 }
             ],
-            max_tokens=1500,
+            max_completion_tokens=1500,
+            reasoning_effort="none",
+            response_format={"type": "json_object"},
         )
         ai_text = response.choices[0].message.content
         import re
