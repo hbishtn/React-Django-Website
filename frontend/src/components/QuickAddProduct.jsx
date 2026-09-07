@@ -21,6 +21,8 @@ function QuickAddProduct() {
   const [newCategoryName, setNewCategoryName] = useState('');
   const [recentlyAdded, setRecentlyAdded] = useState([]);
   const [removingBg, setRemovingBg] = useState(false);
+  const [matching, setMatching] = useState(false);
+  const [matchInfo, setMatchInfo] = useState(null);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/categories/?page_size=100`)
@@ -29,17 +31,50 @@ function QuickAddProduct() {
     }, []);
     
 
+  const checkImageMatch = async (compressedFile) => {
+    setMatching(true);
+    setMatchInfo(null);
+    try {
+      const formData = new FormData();
+      formData.append('image', compressedFile);
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/match-image/`, {
+        method: 'POST',
+        headers: { Authorization: `Token ${token}` },
+        body: formData,
+      });
+      const data = await response.json();
+
+      if (data.match) {
+        setName(data.match.name);
+        setDescription(data.match.description);
+        setCategorySlug(data.match.category_slug);
+        setMatchInfo({ confidence: data.match.confidence });
+        setMessage(`Milta-julta purana product mila (${data.match.confidence}% match) — verify karke save karo.`);
+      }
+    } catch (err) {
+      console.error('Match check failed:', err);
+      // Match check fail ho jaaye to bhi koi baat nahi — user "Auto-Generate
+      // with AI" button se normally aage badh sakta hai.
+    }
+    setMatching(false);
+  };
+
   const handleImageSelect = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     setMessage('');
+    setMatchInfo(null);
     try {
       const compressed = await compressImage(file);
       setImage(compressed);
       setImagePreview(URL.createObjectURL(compressed));
       setName('');
       setDescription('');
+      // Pehle apne purane products se match check karo (fast, free, AI nahi
+      // lagti) — sirf tabhi AI (Groq) ka sahara lena padega jab match na mile.
+      checkImageMatch(compressed);
     } catch (err) {
       console.error('Image compress failed:', err);
       setMessage('Yeh photo process nahi ho payi. Kripya doosri photo try karo.');
@@ -351,7 +386,11 @@ function QuickAddProduct() {
           </div>
         )}
 
-        {image && !name && (
+        {image && matching && (
+          <p className="text-xs text-center text-gray-400 mb-3">🔍 Purane products se match check ho raha hai...</p>
+        )}
+
+        {image && !matching && !name && (
           <button
             onClick={handleAnalyze}
             disabled={analyzing}

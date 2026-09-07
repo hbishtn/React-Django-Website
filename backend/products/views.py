@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from django.db.models import Q
 from .models import Category, Product, Order, Cart, CartItem, ProductImage
+from .image_hash import compute_image_hash, hash_distance
 from .serializers import CategorySerializer, ProductListSerializer, ProductDetailSerializer, RegisterSerializer, OrderSerializer, CartSerializer, ReviewSerializer
 from rest_framework.permissions import IsAuthenticated
 from groq import Groq
@@ -315,6 +316,50 @@ def analyze_product_image(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+def match_product_image(request):
+    if not request.user.is_staff:
+        return Response({'error': 'Not authorized'}, status=403)
+
+    image_file = request.FILES.get('image')
+    if not image_file:
+        return Response({'error': 'Image required'}, status=400)
+
+    try:
+        new_hash = compute_image_hash(image_file)
+    except Exception:
+        return Response({'match': None})
+
+    # 64-bit fingerprint mein itna farak tak "same/similar product" maante hain.
+    # Isse kam farak = zyada milta-julta. Isse zyada farak = alag product.
+    MATCH_THRESHOLD = 12
+
+    best_product = None
+    best_distance = None
+
+    products_with_hash = Product.objects.exclude(image_hash__isnull=True).exclude(image_hash='').select_related('category')
+
+    for product in products_with_hash:
+        distance = hash_distance(new_hash, product.image_hash)
+        if best_distance is None or distance < best_distance:
+            best_distance = distance
+            best_product = product
+
+    if best_product and best_distance is not None and best_distance <= MATCH_THRESHOLD:
+        confidence = round((1 - best_distance / 64) * 100)
+        return Response({
+            'match': {
+                'name': best_product.name,
+                'description': best_product.description,
+                'category_slug': best_product.category.slug,
+                'confidence': confidence,
+            }
+        })
+
+    return Response({'match': None})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def quick_add_product(request):
     if not request.user.is_staff:
         return Response({'error': 'Not authorized'}, status=403)
@@ -341,6 +386,13 @@ def quick_add_product(request):
     )
 
     if image_file:
+        try:
+            image_hash_value = compute_image_hash(image_file)
+            product.image_hash = image_hash_value
+            product.save(update_fields=['image_hash'])
+            image_file.seek(0)  # taaki Cloudinary upload sahi se poori file padhe
+        except Exception:
+            pass  # fingerprint fail hone se product creation na ruke
         ProductImage.objects.create(product=product, image=image_file, is_primary=True)
 
     if second_image_file:

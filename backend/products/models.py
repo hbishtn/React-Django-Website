@@ -28,6 +28,7 @@ class Product(models.Model):
     color_hex = models.CharField(max_length=7, blank=True, null=True)
     is_featured = models.BooleanField(default=False)
     featured_order = models.PositiveSmallIntegerField(null=True, blank=True)
+    image_hash = models.CharField(max_length=16, blank=True, null=True, db_index=True)
 
     def __str__(self):
         return self.name
