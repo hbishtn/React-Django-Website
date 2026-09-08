@@ -24,6 +24,7 @@ function QuickAddProduct() {
 
   const [matching, setMatching] = useState(false);
   const [matchInfo, setMatchInfo] = useState(null);
+  const [showCategoryPhotos, setShowCategoryPhotos] = useState(false);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/categories/?page_size=100`)
@@ -500,10 +501,24 @@ function QuickAddProduct() {
           )}
 
           {categories.length > 0 && (
-            <div className="mb-4 border border-gray-200 rounded-lg p-3">
-              <p className="text-xs font-medium text-[#7E818C] mb-2">Category Photos</p>
-              <div className="space-y-2">
-                {categories.map((cat) => (
+            <div className="mb-4 border border-gray-200 rounded-lg">
+              <button
+                type="button"
+                onClick={() => setShowCategoryPhotos((prev) => !prev)}
+                className="w-full flex items-center justify-between px-3 py-2.5"
+              >
+                <span className="text-xs font-medium text-[#7E818C]">Category Photos</span>
+                <svg
+                  width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7E818C" strokeWidth="2.5"
+                  className={`transition-transform ${showCategoryPhotos ? 'rotate-180' : ''}`}
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+
+              {showCategoryPhotos && (
+                <div className="space-y-2 px-3 pb-3">
+                  {categories.map((cat) => (
                   <div key={cat.id} className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
                       <div className="w-9 h-9 rounded-full overflow-hidden bg-[#F5F5F6] shrink-0 border border-gray-200">
@@ -529,7 +544,8 @@ function QuickAddProduct() {
                     </label>
                   </div>
                 ))}
-              </div>
+                </div>
+              )}
             </div>
           )}
 
