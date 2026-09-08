@@ -158,18 +158,20 @@ function HeroBanner({ fallbackProduct }) {
           <button
             onClick={goPrev}
             aria-label="Previous"
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-7 h-7 rounded-full bg-white/40 backdrop-blur-sm text-[#282C3F] flex items-center justify-center hover:bg-white/70 transition-colors"
+            className="absolute left-1 top-1/2 -translate-y-1/2 z-20 text-[#282C3F]/40 hover:text-[#282C3F]/80 transition-colors"
+            style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.12))' }}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M15 18l-6-6 6-6" />
             </svg>
           </button>
           <button
             onClick={goNext}
             aria-label="Next"
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-7 h-7 rounded-full bg-white/40 backdrop-blur-sm text-[#282C3F] flex items-center justify-center hover:bg-white/70 transition-colors"
+            className="absolute right-1 top-1/2 -translate-y-1/2 z-20 text-[#282C3F]/40 hover:text-[#282C3F]/80 transition-colors"
+            style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.12))' }}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M9 18l6-6-6-6" />
             </svg>
           </button>
