@@ -5,6 +5,7 @@ import CategoryTiles from './CategoryTiles';
 import { useLanguage } from '../context/LanguageContext';
 import NailPaintPicker from './NailPaintPicker';
 import HomeSuggestions from './HomeSuggestions';
+import HeroBanner from './HeroBanner';
 import ProductCardSkeleton from './ProductCardSkeleton';
 
 
@@ -102,7 +103,6 @@ function ProductList() {
     const cacheKey = `${categorySlug || ''}|${searchQuery || ''}`;
 
     if (filteredCache[cacheKey]) {
-      // Purana cached data turant dikhao, background mein fresh data bhi le aayenge
       setFilteredProducts(filteredCache[cacheKey]);
       setFilterLoading(false);
     } else {
@@ -125,9 +125,6 @@ function ProductList() {
     fetch(`${import.meta.env.VITE_API_URL}/products/?${params.toString()}`)
       .then((response) => response.json())
       .then((data) => {
-        // Agar iske baad user ne dobara category/search badal di hai, to yeh
-        // purana (stale) response hai — ignore karo, isse hi "purani
-        // category ke products 1 second flash hote hain" wala bug aata tha.
         if (latestFilterRequest.current !== requestId) return;
 
         let results = data.results || data;
@@ -169,6 +166,12 @@ function ProductList() {
         <p className="text-center text-[#7E818C] mb-4">
           Showing results for "<span className="font-semibold text-[#282C3F]">{searchQuery}</span>"
         </p>
+      )}
+
+      {!loading && !isActiveFilter && products.length > 0 && (
+        <div className="-mx-6 mb-4 h-40 sm:h-52 rounded-2xl overflow-hidden">
+          <HeroBanner fallbackProduct={products[0]} />
+        </div>
       )}
 
       <div className="sticky top-0 z-30 bg-[#F5F5F6] pt-2 pb-2 -mx-6 px-3">

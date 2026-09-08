@@ -1,11 +1,49 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
+function extractDominantColor(imageUrl) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      try {
+        const size = 40;
+        const border = 3;
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, size, size);
+        const data = ctx.getImageData(0, 0, size, size).data;
+
+        let r = 0, g = 0, b = 0, count = 0;
+        for (let y = 0; y < size; y++) {
+          for (let x = 0; x < size; x++) {
+            const isEdge = x < border || x >= size - border || y < border || y >= size - border;
+            if (!isEdge) continue;
+            const i = (y * size + x) * 4;
+            r += data[i];
+            g += data[i + 1];
+            b += data[i + 2];
+            count++;
+          }
+        }
+        resolve({ r: Math.round(r / count), g: Math.round(g / count), b: Math.round(b / count) });
+      } catch (err) {
+        resolve(null);
+      }
+    };
+    img.onerror = () => resolve(null);
+    img.src = imageUrl;
+  });
+}
+
 function HeroBanner({ fallbackProduct }) {
   const [slides, setSlides] = useState([]);
   const [loaded, setLoaded] = useState(false);
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
+  const [bgColor, setBgColor] = useState(null);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/products/featured/`)
@@ -14,10 +52,6 @@ function HeroBanner({ fallbackProduct }) {
       .finally(() => setLoaded(true));
   }, []);
 
-  // Jab tak asli featured slides fetch nahi ho jaate, fallbackProduct kabhi
-  // mat dikhao — warna wahi "1 product flash hoke phir 6 tiles aana" wala
-  // jump hota hai. Sirf loaded hone ke baad hi fallback pe jao (agar
-  // genuinely 0 featured products hain).
   const activeSlides = loaded
     ? (slides.length > 0 ? slides : fallbackProduct ? [fallbackProduct] : [])
     : [];
@@ -31,18 +65,32 @@ function HeroBanner({ fallbackProduct }) {
     return () => clearInterval(timer);
   }, [activeSlides.length]);
 
-    if (!loaded) {
-      return (
-        <div className="col-span-2 row-span-2 relative rounded-2xl overflow-hidden border border-gray-200">
-          <div className="w-full h-full hero-shimmer" />
-        </div>
-      );
+  const current = activeSlides.length > 0 ? activeSlides[index % activeSlides.length] : null;
+  const img = current?.images?.find((im) => im.is_primary) || current?.images?.[0];
+
+  useEffect(() => {
+    if (!img) {
+      setBgColor(null);
+      return;
     }
+    let cancelled = false;
+    extractDominantColor(img.image).then((color) => {
+      if (!cancelled) setBgColor(color);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [img?.image]);
 
-  if (activeSlides.length === 0) return null;
+  if (!loaded) {
+    return (
+      <div className="relative w-full h-full rounded-2xl overflow-hidden border border-gray-200">
+        <div className="w-full h-full hero-shimmer" />
+      </div>
+    );
+  }
 
-  const current = activeSlides[index % activeSlides.length];
-  const img = current.images?.find((im) => im.is_primary) || current.images?.[0];
+  if (activeSlides.length === 0 || !current) return null;
 
   const goPrev = (e) => {
     e.preventDefault();
@@ -58,34 +106,59 @@ function HeroBanner({ fallbackProduct }) {
     setIndex((prev) => (prev + 1) % activeSlides.length);
   };
 
+  const goToSlide = (e, i) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDirection(i > index ? 1 : -1);
+    setIndex(i);
+  };
+
+  const bannerBackground = bgColor
+    ? `linear-gradient(135deg, rgb(${bgColor.r}, ${bgColor.g}, ${bgColor.b}) 0%, rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.85) 55%, rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.65) 100%)`
+    : 'linear-gradient(120deg, #FFE1EA, #FFF8F5)';
+
   return (
     <Link
       to={`/products/${current.id}`}
-      className="col-span-2 row-span-2 relative rounded-2xl overflow-hidden group block"
+      className="relative w-full h-full flex items-center justify-between overflow-hidden group block px-5 sm:px-10"
+      style={{ background: bannerBackground, transition: 'background 0.6s ease' }}
     >
-      {img && (
-        <img
-          key={current.id}
-          src={img.image}
-          alt={current.name}
-          className={`w-full h-full object-cover ${direction === 1 ? 'animate-slide-right' : 'animate-slide-left'}`}
-        />
-      )}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-      <div className="absolute bottom-0 left-0 right-0 p-4">
-        <span className="bg-[#FF3F6C] text-white text-[10px] font-bold uppercase px-2 py-1 rounded">
+      <div
+        key={`text-${current.id}`}
+        className={`relative z-10 max-w-[55%] sm:max-w-[45%] ${direction === 1 ? 'animate-slide-right' : 'animate-slide-left'}`}
+      >
+        <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#FF3F6C]">
           Featured
         </span>
-        <h3 className="text-white font-bold text-lg mt-1">{current.name}</h3>
-        <p className="text-white/90 text-sm">₹{current.price}</p>
+        <h3 className="text-lg sm:text-3xl font-black text-[#282C3F] mt-1 leading-tight">
+          {current.name}
+        </h3>
+        <p className="text-[#7E818C] text-xs sm:text-sm mt-1 sm:mt-2 hidden sm:block">
+          Timeless picks, just for you
+        </p>
+        <div className="inline-flex items-center gap-1 mt-3 sm:mt-5 bg-[#FF3F6C] text-white text-xs sm:text-sm font-bold px-4 py-2 rounded-full">
+          Shop Now
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </div>
       </div>
+
+      {img && (
+        <img
+          key={`img-${current.id}`}
+          src={img.image}
+          alt={current.name}
+          className={`relative z-10 h-[85%] sm:h-[90%] object-contain drop-shadow-xl ${direction === 1 ? 'animate-slide-right' : 'animate-slide-left'}`}
+        />
+      )}
 
       {activeSlides.length > 1 && (
         <>
           <button
             onClick={goPrev}
             aria-label="Previous"
-            className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/20 backdrop-blur-sm text-white/90 flex items-center justify-center hover:bg-white/35 transition-colors"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-7 h-7 rounded-full bg-white/40 backdrop-blur-sm text-[#282C3F] flex items-center justify-center hover:bg-white/70 transition-colors"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M15 18l-6-6 6-6" />
@@ -94,7 +167,7 @@ function HeroBanner({ fallbackProduct }) {
           <button
             onClick={goNext}
             aria-label="Next"
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/20 backdrop-blur-sm text-white/90 flex items-center justify-center hover:bg-white/35 transition-colors"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-7 h-7 rounded-full bg-white/40 backdrop-blur-sm text-[#282C3F] flex items-center justify-center hover:bg-white/70 transition-colors"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M9 18l6-6-6-6" />
@@ -104,11 +177,13 @@ function HeroBanner({ fallbackProduct }) {
       )}
 
       {activeSlides.length > 1 && (
-        <div className="absolute top-3 right-3 flex gap-1">
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-1.5">
           {activeSlides.map((_, i) => (
-            <span
+            <button
               key={i}
-              className={`w-1.5 h-1.5 rounded-full ${i === index ? 'bg-white' : 'bg-white/40'}`}
+              onClick={(e) => goToSlide(e, i)}
+              aria-label={`Go to slide ${i + 1}`}
+              className={`h-1.5 rounded-full transition-all ${i === index ? 'w-5 bg-[#FF3F6C]' : 'w-1.5 bg-[#FF3F6C]/30'}`}
             />
           ))}
         </div>
