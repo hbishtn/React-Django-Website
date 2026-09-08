@@ -21,6 +21,7 @@ function QuickAddProduct() {
   const [newCategoryName, setNewCategoryName] = useState('');
   const [recentlyAdded, setRecentlyAdded] = useState([]);
   const [removingBg, setRemovingBg] = useState(false);
+
   const [matching, setMatching] = useState(false);
   const [matchInfo, setMatchInfo] = useState(null);
 
@@ -212,6 +213,31 @@ function QuickAddProduct() {
         setShowNewCategory(false);
       });
 };
+
+  const handleCategoryImageSelect = async (e, categoryId) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      // Category icons chhote (w-16 h-16) dikhte hain, isliye 400px kaafi hai —
+      // isse file aur bhi chhoti (halki) ban jaati hai product photos se.
+      const compressed = await compressImage(file, 400, 0.7);
+      const formData = new FormData();
+      formData.append('image', compressed);
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/categories/${categoryId}/image/`, {
+        method: 'POST',
+        headers: { Authorization: `Token ${token}` },
+        body: formData,
+      });
+      const data = await response.json();
+      setCategories((prev) => prev.map((c) => (c.id === categoryId ? data : c)));
+    } catch (err) {
+      console.error('Category image upload failed:', err);
+      setMessage('Category photo upload nahi ho payi, dubara try karo.');
+    }
+  };
+
   const handleAnalyze = () => {
     if (!image) return;
     setAnalyzing(true);
@@ -470,6 +496,40 @@ function QuickAddProduct() {
               >
                 Create
               </button>
+            </div>
+          )}
+
+          {categories.length > 0 && (
+            <div className="mb-4 border border-gray-200 rounded-lg p-3">
+              <p className="text-xs font-medium text-[#7E818C] mb-2">Category Photos</p>
+              <div className="space-y-2">
+                {categories.map((cat) => (
+                  <div key={cat.id} className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-9 h-9 rounded-full overflow-hidden bg-[#F5F5F6] shrink-0 border border-gray-200">
+                        {cat.image ? (
+                          <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-xs font-bold text-[#7E818C]">
+                            {cat.name.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                      </div>
+                      <span className="text-sm text-[#282C3F] truncate">{cat.name}</span>
+                    </div>
+
+                    <label className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center cursor-pointer hover:border-[#FF3F6C] hover:text-[#FF3F6C] text-gray-400 text-lg font-semibold shrink-0">
+                      +
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleCategoryImageSelect(e, cat.id)}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

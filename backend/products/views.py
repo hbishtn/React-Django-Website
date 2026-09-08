@@ -423,6 +423,27 @@ def create_category(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+def update_category_image(request, category_id):
+    if not request.user.is_staff:
+        return Response({'error': 'Not authorized'}, status=403)
+
+    try:
+        category = Category.objects.get(id=category_id)
+    except Category.DoesNotExist:
+        return Response({'error': 'Category not found'}, status=404)
+
+    image_file = request.FILES.get('image')
+    if not image_file:
+        return Response({'error': 'Image required'}, status=400)
+
+    category.image = image_file
+    category.save()
+
+    serializer = CategorySerializer(category)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def remove_background(request):
     if not request.user.is_staff:
         return Response({'error': 'Not authorized'}, status=403)
