@@ -8,6 +8,12 @@ import App from './App.jsx'
 import { LanguageProvider } from './context/LanguageContext.jsx'
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <GoogleOAuthProvider clientId="949882360226-2rtash8ms56ps5kvess4crp3v1ji5krs.apps.googleusercontent.com">
