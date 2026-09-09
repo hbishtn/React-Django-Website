@@ -37,6 +37,10 @@ function extractDominantColor(imageUrl) {
     img.src = imageUrl;
   });
 }
+function isNearWhite(color) {
+  if (!color) return true;
+  return color.r > 225 && color.g > 225 && color.b > 225;
+}
 
 function HeroBanner({ fallbackProduct }) {
   const [slides, setSlides] = useState([]);
@@ -113,9 +117,11 @@ function HeroBanner({ fallbackProduct }) {
     setIndex(i);
   };
 
-  const bannerBackground = bgColor
-    ? `linear-gradient(135deg, rgb(${bgColor.r}, ${bgColor.g}, ${bgColor.b}) 0%, rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.85) 55%, rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.65) 100%)`
-    : 'linear-gradient(120deg, #FFE1EA, #FFF8F5)';
+  const usePremiumFallback = isNearWhite(bgColor);
+
+  const bannerBackground = usePremiumFallback
+    ? 'linear-gradient(115deg, #5C1A38 0%, #C2185B 42%, #F9C97C 78%, #FDEEF2 100%)'
+    : `linear-gradient(135deg, rgb(${bgColor.r}, ${bgColor.g}, ${bgColor.b}) 0%, rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.85) 55%, rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.65) 100%)`;
 
   return (
     <Link
@@ -127,13 +133,13 @@ function HeroBanner({ fallbackProduct }) {
         key={`text-${current.id}`}
         className={`relative z-10 max-w-[55%] sm:max-w-[45%] ${direction === 1 ? 'animate-slide-right' : 'animate-slide-left'}`}
       >
-        <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#FF3F6C]">
+        <span className={`text-[10px] sm:text-xs font-bold uppercase tracking-widest ${usePremiumFallback ? 'text-[#FFD9E6]' : 'text-[#FF3F6C]'}`}>
           Featured
         </span>
-        <h3 className="text-lg sm:text-3xl font-black text-[#282C3F] mt-1 leading-tight">
+        <h3 className={`text-lg sm:text-3xl font-black mt-1 leading-tight ${usePremiumFallback ? 'text-white' : 'text-[#282C3F]'}`}>
           {current.name}
         </h3>
-        <p className="text-[#7E818C] text-xs sm:text-sm mt-1 sm:mt-2 hidden sm:block">
+        <p className={`text-xs sm:text-sm mt-1 sm:mt-2 hidden sm:block ${usePremiumFallback ? 'text-white/80' : 'text-[#7E818C]'}`}>
           Timeless picks, just for you
         </p>
         <div className="inline-flex items-center gap-1 mt-3 sm:mt-5 bg-[#FF3F6C] text-white text-xs sm:text-sm font-bold px-4 py-2 rounded-full">
@@ -158,7 +164,9 @@ function HeroBanner({ fallbackProduct }) {
           <button
             onClick={goPrev}
             aria-label="Previous"
-            className="absolute left-1 top-1/2 -translate-y-1/2 z-20 text-[#282C3F]/40 hover:text-[#282C3F]/80 transition-colors"
+            className={`absolute left-1 top-1/2 -translate-y-1/2 z-20 transition-colors ${
+              usePremiumFallback ? 'text-white/60 hover:text-white' : 'text-[#282C3F]/40 hover:text-[#282C3F]/80'
+            }`}
             style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.12))' }}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -168,7 +176,9 @@ function HeroBanner({ fallbackProduct }) {
           <button
             onClick={goNext}
             aria-label="Next"
-            className="absolute right-1 top-1/2 -translate-y-1/2 z-20 text-[#282C3F]/40 hover:text-[#282C3F]/80 transition-colors"
+            className={`absolute right-1 top-1/2 -translate-y-1/2 z-20 transition-colors ${
+              usePremiumFallback ? 'text-[#282C3F]/50 hover:text-[#282C3F]/90' : 'text-[#282C3F]/40 hover:text-[#282C3F]/80'
+            }`}
             style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.12))' }}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
