@@ -47,6 +47,8 @@ function Jhumka({ tilt, side }) {
 function ChainArc() {
   return null;
 }
+// add category colors
+const GLOW_COLORS = ['#D4AF37', '#C2185B', '#1E88E5', '#2E7D32', '#8E24AA', '#B8860B'];
 
 function CategoryTiles({ categories, selectedCategory, onSelect, t }) {
   const [tilt, setTilt] = useState(0);
@@ -78,7 +80,7 @@ function CategoryTiles({ categories, selectedCategory, onSelect, t }) {
 
   return (
     <div className="max-w-6xl mx-auto mb-0.1">
-      <div className="flex gap-5 overflow-x-auto pb-2 px-1 scrollbar-hide">
+      <div className="flex gap-5 overflow-x-auto pt-1.5 pb-2 px-2 scrollbar-hide [overflow-clip-margin:20px]">
         <button
           onClick={() => onSelect(null)}
           className="flex flex-col items-center gap-2 shrink-0"
@@ -87,6 +89,7 @@ function CategoryTiles({ categories, selectedCategory, onSelect, t }) {
             className={`relative w-16 h-16 rounded-full flex items-center justify-center bg-[#FF3F6C] border-2 ${
               selectedCategory === null ? 'border-[#282C3F]' : 'border-transparent'
             }`}
+            style={{ boxShadow: '0 0 9px 0px #FF3F6C40' }}
           >
             <span className="text-white text-xs font-bold z-10">{t('allCategories')}</span>
             <ChainArc />
@@ -96,7 +99,7 @@ function CategoryTiles({ categories, selectedCategory, onSelect, t }) {
           <span className="text-xs text-[#282C3F] font-medium">{t('allCategories')}</span>
         </button>
 
-        {categories.map((category) => (
+        {categories.map((category, index) => (
           <button
             key={category.id}
             onClick={() => onSelect(category.id)}
@@ -106,6 +109,7 @@ function CategoryTiles({ categories, selectedCategory, onSelect, t }) {
               className={`w-16 h-16 rounded-full overflow-hidden border-2 ${
                 selectedCategory === category.id ? 'border-[#FF3F6C]' : 'border-gray-200'
               }`}
+              style={{ boxShadow: `0 0 12px 2px ${GLOW_COLORS[index % GLOW_COLORS.length]}59` }}
             >
               {category.image ? (
                 <img
