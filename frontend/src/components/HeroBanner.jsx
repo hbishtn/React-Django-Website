@@ -37,9 +37,29 @@ function extractDominantColor(imageUrl) {
     img.src = imageUrl;
   });
 }
-function isNearWhite(color) {
-  if (!color) return true;
-  return color.r > 225 && color.g > 225 && color.b > 225;
+// 6 vivid glow colors — har slide pe cycle karenge, dark neutral base pe
+// glow karte hue (zyada eye-catching)
+const GLOW_COLORS = [
+  '#38BDF8', // sky blue
+  '#4ADE80', // light green
+  '#F472B6', // light pink
+  '#FACC15', // light yellow
+  '#F87171', // light red
+  '#A78BFA', // light purple
+];
+
+function lighten(color, amount = 0.7) {
+  return {
+    r: Math.round(color.r + (255 - color.r) * amount),
+    g: Math.round(color.g + (255 - color.g) * amount),
+    b: Math.round(color.b + (255 - color.b) * amount),
+  };
+}
+
+function hexToRgb(hex) {
+  const clean = hex.replace('#', '');
+  const bigint = parseInt(clean, 16);
+  return { r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255 };
 }
 
 function HeroBanner({ fallbackProduct }) {
@@ -117,11 +137,14 @@ function HeroBanner({ fallbackProduct }) {
     setIndex(i);
   };
 
-  const usePremiumFallback = isNearWhite(bgColor);
+  const glowColor = GLOW_COLORS[index % GLOW_COLORS.length];
+  const glowRgb = hexToRgb(glowColor);
+  const productTint = bgColor ? lighten(bgColor, 0.6) : { r: 255, g: 236, b: 240 };
 
-  const bannerBackground = usePremiumFallback
-    ? 'linear-gradient(115deg, #5C1A38 0%, #C2185B 42%, #F9C97C 78%, #FDEEF2 100%)'
-    : `linear-gradient(135deg, rgb(${bgColor.r}, ${bgColor.g}, ${bgColor.b}) 0%, rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.85) 55%, rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.65) 100%)`;
+  // Pure white/light base — koi dark background nahi. Sirf ek vivid
+  // glow color text ke peeche se radiate karta hai, aur product photo
+  // ka apna color halka sa image side pe blend hota hai
+  const bannerBackground = `radial-gradient(circle at 15% 45%, rgba(${glowRgb.r}, ${glowRgb.g}, ${glowRgb.b}, 0.55), transparent 60%), radial-gradient(circle at 85% 60%, rgba(${productTint.r}, ${productTint.g}, ${productTint.b}, 0.45), transparent 55%), #FFFFFF`;
 
   return (
     <Link
@@ -133,14 +156,17 @@ function HeroBanner({ fallbackProduct }) {
         key={`text-${current.id}`}
         className={`relative z-10 max-w-[55%] sm:max-w-[45%] ${direction === 1 ? 'animate-slide-right' : 'animate-slide-left'}`}
       >
-        <span className={`text-[10px] sm:text-xs font-bold uppercase tracking-widest ${usePremiumFallback ? 'text-[#FFD9E6]' : 'text-[#FF3F6C]'}`}>
+        <span
+          className="text-[10px] sm:text-xs font-bold uppercase tracking-widest"
+          style={{ color: glowColor }}
+        >
           Featured
         </span>
-        <h3 className={`text-lg sm:text-3xl font-black mt-1 leading-tight ${usePremiumFallback ? 'text-white' : 'text-[#282C3F]'}`}>
+        <h3 className="font-display italic text-xl sm:text-4xl font-bold text-[#2E2530] mt-1 leading-tight tracking-wide">
           {current.name}
         </h3>
-        <p className={`text-xs sm:text-sm mt-1 sm:mt-2 hidden sm:block ${usePremiumFallback ? 'text-white/80' : 'text-[#7E818C]'}`}>
-          Timeless picks, just for you
+        <p className="font-display italic text-[#7A6E75] text-xs sm:text-base mt-1 sm:mt-2 hidden sm:block">
+          Elegance, curated for you
         </p>
         <div className="inline-flex items-center gap-1 mt-3 sm:mt-5 bg-[#FF3F6C] text-white text-xs sm:text-sm font-bold px-4 py-2 rounded-full">
           Shop Now
@@ -155,7 +181,8 @@ function HeroBanner({ fallbackProduct }) {
           key={`img-${current.id}`}
           src={img.image}
           alt={current.name}
-          className={`relative z-10 h-[85%] sm:h-[90%] object-contain drop-shadow-xl ${direction === 1 ? 'animate-slide-right' : 'animate-slide-left'}`}
+          className={`relative z-10 h-[85%] sm:h-[90%] object-contain ${direction === 1 ? 'animate-slide-right' : 'animate-slide-left'}`}
+          style={{ filter: `drop-shadow(10px 12px 22px rgba(${glowRgb.r}, ${glowRgb.g}, ${glowRgb.b}, 0.45))` }}
         />
       )}
 
@@ -164,10 +191,7 @@ function HeroBanner({ fallbackProduct }) {
           <button
             onClick={goPrev}
             aria-label="Previous"
-            className={`absolute left-1 top-1/2 -translate-y-1/2 z-20 transition-colors ${
-              usePremiumFallback ? 'text-white/60 hover:text-white' : 'text-[#282C3F]/40 hover:text-[#282C3F]/80'
-            }`}
-            style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.12))' }}
+            className="absolute left-1 top-1/2 -translate-y-1/2 z-20 text-[#2E2530]/40 hover:text-[#2E2530]/80 transition-colors"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M15 18l-6-6 6-6" />
@@ -176,10 +200,7 @@ function HeroBanner({ fallbackProduct }) {
           <button
             onClick={goNext}
             aria-label="Next"
-            className={`absolute right-1 top-1/2 -translate-y-1/2 z-20 transition-colors ${
-              usePremiumFallback ? 'text-[#282C3F]/50 hover:text-[#282C3F]/90' : 'text-[#282C3F]/40 hover:text-[#282C3F]/80'
-            }`}
-            style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.12))' }}
+            className="absolute right-1 top-1/2 -translate-y-1/2 z-20 text-[#2E2530]/40 hover:text-[#2E2530]/80 transition-colors"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M9 18l6-6-6-6" />
@@ -195,7 +216,8 @@ function HeroBanner({ fallbackProduct }) {
               key={i}
               onClick={(e) => goToSlide(e, i)}
               aria-label={`Go to slide ${i + 1}`}
-              className={`h-1.5 rounded-full transition-all ${i === index ? 'w-5 bg-[#FF3F6C]' : 'w-1.5 bg-[#FF3F6C]/30'}`}
+              className={`h-1.5 rounded-full transition-all ${i === index ? 'w-5' : 'w-1.5 bg-[#2E2530]/25'}`}
+              style={i === index ? { backgroundColor: glowColor } : undefined}
             />
           ))}
         </div>

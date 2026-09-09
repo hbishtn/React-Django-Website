@@ -1,8 +1,14 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&display=swap');
 
 body {
   font-family: 'Poppins', sans-serif;
 }
+
+.font-display {
+  font-family: 'Playfair Display', serif;
+}
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
