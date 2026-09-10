@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.bishtcosmetic.app",
+    "sha256_cert_fingerprints": [
+      "56:C4:AA:F7:A4:9F:7C:8A:3A:07:00:27:6D:64:CD:15:97:AA:75:38:08:5A:B2:BC:E0:B5:59:2E:62:DB:CC:B1"
+    ]
+  }
+}]
