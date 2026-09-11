@@ -11,17 +11,21 @@ function HomeSuggestions({ products }) {
 
   return (
     <div className="max-w-7xl mx-auto">
-      <h2 className="text-lg font-bold text-[#282C3F] mb-4">Curated For You</h2>
+      <div className="flex items-center gap-2 mb-4 -mx-3 px-3">
+        <span className="bg-gradient-to-r from-[#FF3F6C] to-[#FF9F00] text-white text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide shadow-sm">
+          🔥 Hot
+        </span>
+        <h2 className="text-lg font-black text-[#282C3F]">Discount Offers For You</h2>
+      </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4" style={{ gridAutoRows: '150px' }}>
-        {/* Small tiles */}
+      <div className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory -mx-3 px-3 pb-1">
         {rest.map((product, i) => {
           const img = product.images.find((im) => im.is_primary) || product.images[0];
           return (
             <Link
               key={product.id}
               to={`/products/${product.id}`}
-              className="relative rounded-2xl overflow-hidden group"
+              className="relative rounded-2xl overflow-hidden group flex-none w-[42%] sm:w-[23%] h-40 snap-start"
             >
               {img && (
                 <img
