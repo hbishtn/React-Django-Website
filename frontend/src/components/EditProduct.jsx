@@ -21,6 +21,10 @@ function EditProduct() {
   const [message, setMessage] = useState('');
   const [deleting, setDeleting] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [showDiscount, setShowDiscount] = useState(false);
+  const [discountPrice, setDiscountPrice] = useState('');
+  const [discountEndsAt, setDiscountEndsAt] = useState('');
+  const [hasExistingDiscount, setHasExistingDiscount] = useState(false);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/products/${id}/`)
@@ -31,6 +35,19 @@ function EditProduct() {
         setPrice(data.price);
         setStock(data.stock);
         setCurrentImages(data.images || []);
+        if (data.discount_price) {
+          setDiscountPrice(data.discount_price);
+          setHasExistingDiscount(true);
+          setShowDiscount(true);
+        }
+        if (data.discount_ends_at) {
+          // datetime-local input ko "YYYY-MM-DDTHH:mm" format chahiye
+          const d = new Date(data.discount_ends_at);
+          const localStr = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+            .toISOString()
+            .slice(0, 16);
+          setDiscountEndsAt(localStr);
+        }
       });
 
     fetch(`${import.meta.env.VITE_API_URL}/categories/?page_size=100`)
@@ -153,6 +170,8 @@ function EditProduct() {
     if (categorySlug) formData.append('category_slug', categorySlug);
     if (newImage) formData.append('image', newImage);
     if (newSecondImage) formData.append('second_image', newSecondImage);
+    if (discountPrice) formData.append('discount_price', discountPrice);
+    if (discountEndsAt) formData.append('discount_ends_at', new Date(discountEndsAt).toISOString());
 
     fetch(`${import.meta.env.VITE_API_URL}/products/${id}/edit/`, {
       method: 'PATCH',
@@ -165,6 +184,26 @@ function EditProduct() {
         setTimeout(() => navigate(`/products/${id}`), 1000);
       })
       .catch(() => setMessage('Update fail ho gaya.'));
+  };
+
+  const handleRemoveDiscount = () => {
+    setMessage('Discount hata rahe hain...');
+    const formData = new FormData();
+    formData.append('remove_discount', 'true');
+
+    fetch(`${import.meta.env.VITE_API_URL}/products/${id}/edit/`, {
+      method: 'PATCH',
+      headers: { Authorization: `Token ${token}` },
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then(() => {
+        setDiscountPrice('');
+        setDiscountEndsAt('');
+        setHasExistingDiscount(false);
+        setMessage('Discount hata diya gaya.');
+      })
+      .catch(() => setMessage('Kuch galat ho gaya.'));
   };
 
   const handleDelete = () => {
@@ -269,6 +308,58 @@ function EditProduct() {
               <option key={cat.id} value={cat.slug}>{cat.name}</option>
             ))}
           </select>
+
+          <div className="mb-4 border border-gray-200 rounded-lg overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setShowDiscount((v) => !v)}
+              className="w-full flex items-center justify-between px-3 py-2.5 bg-[#FFF0F4] text-sm font-semibold text-[#FF3F6C]"
+            >
+              <span>🏷️ Discount {hasExistingDiscount ? '(active)' : '(optional)'}</span>
+              <span>{showDiscount ? '▲' : '▼'}</span>
+            </button>
+
+            {showDiscount && (
+              <div className="p-3 space-y-3">
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Discount price (₹)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={discountPrice}
+                    onChange={(e) => setDiscountPrice(e.target.value)}
+                    placeholder="e.g. 799"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                  />
+                  <p className="text-[11px] text-gray-400 mt-1">
+                    Original price crossed out mein, ye price green mein dikhega.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">
+                    Offer khatam hone ka time (optional — countdown timer)
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={discountEndsAt}
+                    onChange={(e) => setDiscountEndsAt(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                  />
+                </div>
+
+                {hasExistingDiscount && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveDiscount}
+                    className="text-xs text-red-500 font-medium"
+                  >
+                    Discount hatao
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
 
           <button
             type="submit"

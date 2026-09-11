@@ -483,6 +483,9 @@ def edit_product(request, product_id):
     category_slug = request.data.get('category_slug')
     new_image = request.FILES.get('image')
     new_second_image = request.FILES.get('second_image')
+    discount_price = request.data.get('discount_price')
+    discount_ends_at = request.data.get('discount_ends_at')
+    remove_discount = request.data.get('remove_discount')
 
     if name: product.name = name
     if description: product.description = description
@@ -493,6 +496,16 @@ def edit_product(request, product_id):
             product.category = Category.objects.get(slug=category_slug)
         except Category.DoesNotExist:
             pass
+
+    # Discount hatane ka explicit option (admin discount cancel kar sake)
+    if remove_discount == 'true':
+        product.discount_price = None
+        product.discount_ends_at = None
+    else:
+        if discount_price:
+            product.discount_price = discount_price
+        if discount_ends_at:
+            product.discount_ends_at = discount_ends_at
 
     product.save()
 

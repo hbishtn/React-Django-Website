@@ -31,6 +31,7 @@ class ProductListSerializer(serializers.ModelSerializer):
             'category', 'category_name', 'images', 'created_at',
             'color_group', 'color_name', 'color_hex',
             'is_featured', 'featured_order',
+            'discount_price', 'discount_ends_at',
         ]
 
 

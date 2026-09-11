@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
+import PriceDisplay from './PriceDisplay';
 
 const accentColors = ['#FF3F6C', '#14958F', '#FF9F00'];
 
@@ -49,8 +50,12 @@ function ProductCard({ product, index = 0 }) {
           </h3>
           <p className="text-xs text-[#7E818C] mt-0.5">{product.category_name}</p>
 
-          <div className="flex items-center gap-2 mt-2">
-            <span className="text-[#282C3F] font-bold">₹{product.price}</span>
+          <div className="mt-2">
+            <PriceDisplay
+              price={product.price}
+              discountPrice={product.discount_price}
+              discountEndsAt={product.discount_ends_at}
+            />
           </div>
 
           {lowStock && (

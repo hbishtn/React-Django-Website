@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import RelatedProductCard from './RelatedProductCard';
 import LoadingScreen from './LoadingScreen';
+import PriceDisplay from './PriceDisplay';
 
 function ProductDetail() {
   const { id } = useParams();
@@ -196,7 +197,14 @@ function ProductDetail() {
             )}
           </div>
 
-          <p className="text-3xl font-bold text-[#282C3F] mt-4">₹{product.price}</p>
+          <div className="mt-4">
+            <PriceDisplay
+              price={product.price}
+              discountPrice={product.discount_price}
+              discountEndsAt={product.discount_ends_at}
+              size="lg"
+            />
+          </div>
 
           <span className={`inline-block mt-2 text-xs font-medium px-2.5 py-1 rounded-full ${stockStatus.className}`}>
             {stockStatus.text}
