@@ -482,6 +482,7 @@ def edit_product(request, product_id):
     stock = request.data.get('stock')
     category_slug = request.data.get('category_slug')
     new_image = request.FILES.get('image')
+    new_second_image = request.FILES.get('second_image')
 
     if name: product.name = name
     if description: product.description = description
@@ -495,11 +496,34 @@ def edit_product(request, product_id):
 
     product.save()
 
+    # Agar product ki abhi koi image hi nahi hai, to sabse pehli naye upload ko
+    # hi primary bana do — taaki product listing/cards mein turant dikhe.
+    has_existing_image = product.images.exists()
+
     if new_image:
-        ProductImage.objects.create(product=product, image=new_image, is_primary=False)
+        ProductImage.objects.create(product=product, image=new_image, is_primary=not has_existing_image)
+        has_existing_image = True
+
+    if new_second_image:
+        ProductImage.objects.create(product=product, image=new_second_image, is_primary=not has_existing_image)
 
     serializer = ProductDetailSerializer(product)
     return Response(serializer.data)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_product(request, product_id):
+    if not request.user.is_staff:
+        return Response({'error': 'Not authorized'}, status=403)
+
+    try:
+        product = Product.objects.get(id=product_id)
+    except Product.DoesNotExist:
+        return Response({'error': 'Product not found'}, status=404)
+
+    product.delete()
+    return Response({'success': True})
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
