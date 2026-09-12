@@ -214,6 +214,23 @@ def add_to_cart(request):
     return Response(serializer.data)
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def decrease_cart_item(request, item_id):
+    cart_item = CartItem.objects.filter(id=item_id, cart__user=request.user).first()
+
+    if cart_item:
+        if cart_item.quantity > 1:
+            cart_item.quantity -= 1
+            cart_item.save()
+        else:
+            cart_item.delete()
+
+    cart = Cart.objects.get(user=request.user)
+    serializer = CartSerializer(cart)
+    return Response(serializer.data)
+
+
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def remove_from_cart(request, item_id):

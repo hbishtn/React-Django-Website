@@ -5,7 +5,7 @@ import PriceDisplay from './PriceDisplay';
 import OrderSummary from './OrderSummary';
 
 function Cart() {
-  const { cartItems, addToCart, removeFromCart } = useCart();
+  const { cartItems, addToCart, decreaseFromCart, removeFromCart } = useCart();
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const payableTotal = cartItems.reduce(
@@ -102,9 +102,16 @@ function Cart() {
                     </div>
 
                     <div className="flex items-center justify-between mt-3">
-                      <div className="flex items-center gap-1 border border-gray-200 rounded-full p-1">
-                        <span className="text-xs font-semibold text-[#282C3F] px-2">
-                          Qty: {item.quantity}
+                      <div className="flex items-center gap-2 border border-gray-200 rounded-full p-1">
+                        <button
+                          onClick={() => decreaseFromCart(item.id)}
+                          aria-label="Reduce quantity"
+                          className="w-6 h-6 rounded-full bg-[#FFF1F4] text-[#FF3F6C] font-bold text-sm flex items-center justify-center hover:bg-[#FF3F6C] hover:text-white transition-colors"
+                        >
+                          &minus;
+                        </button>
+                        <span className="text-xs font-semibold text-[#282C3F] w-4 text-center">
+                          {item.quantity}
                         </span>
                         <button
                           onClick={() => addToCart(product)}

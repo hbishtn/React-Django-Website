@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const MASCOTS = {
   Tingu: { body: '#5BC8F5', dark: '#1565C0', bell: '#FFC107', bellDark: '#F57F17' },
@@ -153,6 +154,8 @@ function MascotIcon({ name, size = 64 }) {
   return null;
 }
 function ChatWidget() {
+  const location = useLocation();
+  const hiddenOnRoutes = ['/cart', '/checkout'];
   const [isOpen, setIsOpen] = useState(false);
   const [selectedMascot, setSelectedMascot] = useState('Tingu');
   const [showMascotPicker, setShowMascotPicker] = useState(false);
@@ -211,6 +214,8 @@ function ChatWidget() {
       })
       .finally(() => clearTimeout(timeoutId));
   };
+
+  if (hiddenOnRoutes.includes(location.pathname)) return null;
 
   return (
     <div className="fixed bottom-20 sm:bottom-6 right-6 z-[100]">
