@@ -91,7 +91,11 @@ function CategoryTiles({ categories, selectedCategory, onSelect, t }) {
             }`}
             style={{ boxShadow: '0 0 9px 0px #FF3F6C40' }}
           >
-            <span className="text-white text-xs font-bold z-10">{t('allCategories')}</span>
+            <svg className="w-8 h-8 z-10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 11.5L12 4l9 7.5" />
+              <path d="M5.5 10v9a1 1 0 001 1h11a1 1 0 001-1v-9" />
+              <path d="M9.5 20v-6h5v6" />
+            </svg>
             <ChainArc />
             <Jhumka tilt={tilt} side="left" />
             <Jhumka tilt={tilt} side="right" />
