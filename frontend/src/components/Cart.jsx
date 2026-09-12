@@ -38,7 +38,7 @@ function Cart() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F5F6] pb-28 lg:pb-10">
+    <div className="min-h-screen bg-[#F5F5F6] pb-40 sm:pb-28 lg:pb-10">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <h2 className="font-display text-2xl sm:text-3xl text-[#282C3F]">Your Bag</h2>
         <p className="text-sm text-gray-500 mt-1 mb-6">
@@ -135,7 +135,7 @@ function Cart() {
         </div>
       </div>
 
-      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-between gap-4 z-20">
+      <div className="lg:hidden fixed bottom-16 sm:bottom-0 inset-x-0 bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-between gap-4 z-30 shadow-[0_-2px_8px_rgba(0,0,0,0.06)]">
         <div>
           <p className="text-[11px] text-gray-500">Total amount</p>
           <p className="font-display text-lg text-[#282C3F]">₹{payableTotal.toFixed(2)}</p>

@@ -78,7 +78,7 @@ function Checkout() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F5F6]">
+    <div className="min-h-screen bg-[#F5F5F6] pb-10 sm:pb-8">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <h2 className="font-display text-2xl sm:text-3xl text-[#282C3F] mb-6">Checkout</h2>
 
