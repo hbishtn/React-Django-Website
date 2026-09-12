@@ -67,14 +67,14 @@ function HomeSuggestions({ products }) {
     <div className="max-w-7xl mx-auto">
       {offerRow.length > 0 && (
         <>
-          <div className="flex items-center gap-2 mb-4 -mx-3 px-3">
+          <div className="flex items-center gap-2 mb-4 -mx-3 sm:-mx-6 px-3 sm:px-6">
             <span className="bg-gradient-to-r from-[#FF3F6C] to-[#FF9F00] text-white text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide shadow-sm">
               🔥 Hot
             </span>
             <h2 className="text-lg font-black text-[#282C3F]">Discount Offers For You</h2>
           </div>
 
-          <div className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory -mx-3 px-3 pb-1 mb-8">
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory -mx-3 sm:-mx-6 px-3 sm:px-6 pb-1 mb-8">
             {offerRow.map((product) => (
               <OfferTile key={product.id} product={product} />
             ))}

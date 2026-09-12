@@ -2,55 +2,68 @@ import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import PriceDisplay from './PriceDisplay';
 
-const accentColors = ['#FF3F6C', '#14958F', '#FF9F00'];
-
-function ProductCard({ product, index = 0 }) {
+function ProductCard({ product }) {
   const [wishlisted, setWishlisted] = useState(false);
   const primaryImage = product.images.find((img) => img.is_primary) || product.images[0];
-  const accent = accentColors[index % accentColors.length];
 
   const isNew =
     (new Date() - new Date(product.created_at)) / (1000 * 60 * 60 * 24) <= 7;
   const lowStock = product.stock > 0 && product.stock <= 5;
 
   return (
-    <div className="group relative bg-white rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-300 overflow-hidden border border-gray-100">
+    <div className="group relative bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow duration-300">
       <button
         onClick={(e) => {
           e.preventDefault();
           setWishlisted(!wishlisted);
         }}
-        className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center shadow-sm"
+        className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white/95 flex items-center justify-center shadow-sm"
       >
-        <span className={wishlisted ? 'text-[#FF3F6C]' : 'text-gray-300'}>
-          ♥
-        </span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-3.5 h-3.5"
+          viewBox="0 0 24 24"
+          fill={wishlisted ? '#FF3F6C' : 'none'}
+          stroke={wishlisted ? '#FF3F6C' : '#9CA3AF'}
+          strokeWidth="2"
+        >
+          <path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 10-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z" />
+        </svg>
       </button>
 
-      {isNew && (
-        <span className="absolute top-2 left-2 z-10 bg-[#14958F] text-white text-[10px] font-bold uppercase px-2 py-1 rounded">
-          New
-        </span>
-      )}
-
       <Link to={`/products/${product.id}`}>
-        {primaryImage && (
-          <img
-            src={primaryImage.image}
-            alt={product.name}
-            loading="lazy"
-            className="w-full h-56 object-cover"
-          />
-        )}
-        <div className="h-0.5 w-full" style={{ backgroundColor: accent }} />
+        <div className="relative aspect-[3/4] overflow-hidden bg-[#F5F5F6]">
+          {primaryImage && (
+            <img
+              src={primaryImage.image}
+              alt={product.name}
+              loading="lazy"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+          )}
 
-        <div className="p-3">
-          <h3 className="text-sm text-[#282C3F] font-semibold truncate">
+          {isNew && (
+            <span className="absolute top-2 left-2 bg-[#14958F] text-white text-[9px] font-bold uppercase px-1.5 py-0.5 rounded">
+              New
+            </span>
+          )}
+
+          {product.discount_price && (
+            <span className="absolute bottom-2 left-2 bg-[#FF3F6C] text-white text-[9px] font-bold uppercase px-1.5 py-0.5 rounded">
+              Sale
+            </span>
+          )}
+        </div>
+
+        <div className="p-2.5 sm:p-3">
+          <p className="text-[10px] text-[#9CA3AF] uppercase tracking-wide truncate">
+            {product.category_name}
+          </p>
+          <h3 className="text-sm text-[#282C3F] font-semibold truncate mt-0.5">
             {product.name}
           </h3>
-          <p className="text-xs text-[#7E818C] mt-0.5">{product.category_name}</p>
 
-          <div className="mt-2">
+          <div className="mt-1.5">
             <PriceDisplay
               price={product.price}
               discountPrice={product.discount_price}
@@ -59,7 +72,7 @@ function ProductCard({ product, index = 0 }) {
           </div>
 
           {lowStock && (
-            <p className="text-[#FF9F00] text-xs font-semibold mt-1">
+            <p className="text-[#FF9F00] text-[11px] font-semibold mt-1">
               Only {product.stock} left!
             </p>
           )}

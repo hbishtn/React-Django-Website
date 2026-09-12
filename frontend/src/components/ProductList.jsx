@@ -163,7 +163,7 @@ function ProductList() {
   });
 
   return (
-    <div className="min-h-screen bg-[#F5F5F6] p-6">
+    <div className="min-h-screen bg-[#F5F5F6] px-3 py-4 sm:px-6 sm:py-6">
       {searchQuery && (
         <p className="text-center text-[#7E818C] mb-4">
           Showing results for "<span className="font-semibold text-[#282C3F]">{searchQuery}</span>"
@@ -171,12 +171,12 @@ function ProductList() {
       )}
 
       {!loading && !isActiveFilter && products.length > 0 && (
-        <div className="-mx-3 mb-2 h-40 sm:h-52 rounded-2xl overflow-hidden">
+        <div className="-mx-3 sm:-mx-6 mb-2 h-40 sm:h-52 rounded-2xl overflow-hidden">
           <HeroBanner fallbackProduct={products[0]} />
         </div>
       )}
 
-      <div className="sticky top-0 z-30 bg-[#F5F5F6] pt-2 pb-2 -mx-6 px-3">
+      <div className="sticky top-0 z-30 bg-[#F5F5F6] pt-2 pb-2 -mx-3 sm:-mx-6 px-3">
         <CategoryTiles
           categories={sortedCategories}
           selectedCategory={selectedCategory}
@@ -186,7 +186,7 @@ function ProductList() {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 max-w-7xl mx-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 max-w-7xl mx-auto">
           {Array.from({ length: 10 }).map((_, i) => (
             <ProductCardSkeleton key={i} />
           ))}
@@ -196,7 +196,7 @@ function ProductList() {
       ) : !isActiveFilter ? (
         <HomeSuggestions products={products} />
       ) : filterLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 max-w-7xl mx-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 max-w-7xl mx-auto">
           {Array.from({ length: 10 }).map((_, i) => (
             <ProductCardSkeleton key={i} />
           ))}
@@ -204,7 +204,7 @@ function ProductList() {
       ) : filteredProducts.length === 0 ? (
         <p className="text-center text-gray-500 mt-10">No products found.</p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 max-w-7xl mx-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 max-w-7xl mx-auto">
           {filteredProducts.map((product, index) => (
             <ProductCard key={product.id} product={product} index={index} />
           ))}
