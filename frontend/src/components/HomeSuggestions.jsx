@@ -1,29 +1,60 @@
 import { Link } from 'react-router-dom';
 import ProductCard from './ProductCard';
+import { isDiscountActive, sortByDiscountPriority } from '../utils/discount';
+import { useCountdown } from '../hooks/useCountdown';
 
-function isDiscountActive(product) {
-  if (!product.discount_price) return false;
-  if (!product.discount_ends_at) return true;
-  return new Date(product.discount_ends_at).getTime() > Date.now();
-}
+function OfferTile({ product }) {
+  const hasDiscount = isDiscountActive(product);
+  const timeLeft = useCountdown(product.discount_ends_at);
+  const img = product.images.find((im) => im.is_primary) || product.images[0];
 
-function discountMargin(product) {
-  return Number(product.price) - Number(product.discount_price);
+  return (
+    <Link
+      to={`/products/${product.id}`}
+      className="relative rounded-2xl overflow-hidden group flex-none w-[42%] sm:w-[23%] h-40 snap-start"
+    >
+      {img && (
+        <img
+          src={img.image}
+          alt={product.name}
+          loading="lazy"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+
+      {hasDiscount && (
+        <span className="absolute top-2 left-2 bg-[#FF3F6C] text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+          SALE
+        </span>
+      )}
+
+      <div className="absolute bottom-0 left-0 right-0 p-2">
+        <p className="text-white text-xs font-semibold truncate">{product.name}</p>
+        {hasDiscount ? (
+          <>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-white/70 text-[10px] line-through">₹{product.price}</span>
+              <span className="text-[#4ADE80] text-[11px] font-bold">₹{product.discount_price}</span>
+            </div>
+            {timeLeft && (
+              <p className="text-[#FFD166] text-[10px] font-bold mt-0.5">
+                {String(timeLeft.hours).padStart(2, '0')}:{String(timeLeft.minutes).padStart(2, '0')}:{String(timeLeft.seconds).padStart(2, '0')}
+              </p>
+            )}
+          </>
+        ) : (
+          <p className="text-white/90 text-[11px]">₹{product.price}</p>
+        )}
+      </div>
+    </Link>
+  );
 }
 
 function HomeSuggestions({ products }) {
-  // Pehle sabse zyada discount margin wale products dikhao. Agar discount
-  // wale products kam hain, to baaki jagah recent products se bhar dete
-  // hain — taaki row kabhi khali/adhuri na dikhe.
-  const discounted = products
-    .filter(isDiscountActive)
-    .sort((a, b) => discountMargin(b) - discountMargin(a));
-
-  const nonDiscounted = [...products]
-    .filter((p) => !isDiscountActive(p))
-    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-  const offerRow = [...discounted, ...nonDiscounted].slice(0, 8);
+  const offerRow = sortByDiscountPriority(
+    [...products].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+  ).slice(0, 8);
 
   // Featured Products section — sabse naye products pehle, sequence mein
   const featuredGrid = [...products]
@@ -44,45 +75,9 @@ function HomeSuggestions({ products }) {
           </div>
 
           <div className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory -mx-3 px-3 pb-1 mb-8">
-            {offerRow.map((product) => {
-              const img = product.images.find((im) => im.is_primary) || product.images[0];
-              const hasDiscount = isDiscountActive(product);
-              return (
-                <Link
-                  key={product.id}
-                  to={`/products/${product.id}`}
-                  className="relative rounded-2xl overflow-hidden group flex-none w-[42%] sm:w-[23%] h-40 snap-start"
-                >
-                  {img && (
-                    <img
-                      src={img.image}
-                      alt={product.name}
-                      loading="lazy"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-
-                  {hasDiscount && (
-                    <span className="absolute top-2 left-2 bg-[#FF3F6C] text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                      SALE
-                    </span>
-                  )}
-
-                  <div className="absolute bottom-0 left-0 right-0 p-2">
-                    <p className="text-white text-xs font-semibold truncate">{product.name}</p>
-                    {hasDiscount ? (
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[#FF8A9B] text-[10px] line-through">₹{product.price}</span>
-                        <span className="text-[#4ADE80] text-[11px] font-bold">₹{product.discount_price}</span>
-                      </div>
-                    ) : (
-                      <p className="text-white/90 text-[11px]">₹{product.price}</p>
-                    )}
-                  </div>
-                </Link>
-              );
-            })}
+            {offerRow.map((product) => (
+              <OfferTile key={product.id} product={product} />
+            ))}
           </div>
         </>
       )}

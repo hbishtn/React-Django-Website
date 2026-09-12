@@ -7,6 +7,7 @@ import NailPaintPicker from './NailPaintPicker';
 import HomeSuggestions from './HomeSuggestions';
 import HeroBanner from './HeroBanner';
 import ProductCardSkeleton from './ProductCardSkeleton';
+import { sortByDiscountPriority } from '../utils/discount';
 
 
 const CATEGORY_GROUPS = {
@@ -131,6 +132,7 @@ function ProductList() {
         if (categorySlug === 'jewelry') {
           results = seededShuffle(results, getTimeSeed());
         }
+        results = sortByDiscountPriority(results);
         filteredCache[cacheKey] = results;
         setFilteredProducts(results);
       })
