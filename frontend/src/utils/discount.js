@@ -4,6 +4,10 @@ export function isDiscountActive(product) {
   return new Date(product.discount_ends_at).getTime() > Date.now();
 }
 
+export function getEffectivePrice(product) {
+  return isDiscountActive(product) ? Number(product.discount_price) : Number(product.price);
+}
+
 export function discountMargin(product) {
   return Number(product.price) - Number(product.discount_price);
 }

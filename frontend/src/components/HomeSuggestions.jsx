@@ -68,8 +68,8 @@ function HomeSuggestions({ products }) {
       {offerRow.length > 0 && (
         <>
           <div className="flex items-center gap-2 mb-4">
-            <span className="bg-gradient-to-r from-[#FF3F6C] to-[#FF9F00] text-white text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide shadow-sm">
-              🔥 Hot
+            <span className="sale-badge-pop text-white text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide shadow-sm">
+              Sale
             </span>
             <h2 className="text-lg font-black text-[#282C3F]">Discount Offers For You</h2>
           </div>

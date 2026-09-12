@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { getEffectivePrice } from '../utils/discount';
 
 function Checkout() {
   const { cartItems, clearCart } = useCart();
@@ -14,7 +15,7 @@ function Checkout() {
   const [error, setError] = useState('');
 
   const totalPrice = cartItems.reduce(
-    (sum, item) => sum + item.product_detail.price * item.quantity,
+    (sum, item) => sum + getEffectivePrice(item.product_detail) * item.quantity,
     0
   );
 
@@ -30,7 +31,7 @@ function Checkout() {
       items: cartItems.map((item) => ({
         product: item.product_detail.id,
         quantity: item.quantity,
-        price: item.product_detail.price,
+        price: getEffectivePrice(item.product_detail),
       })),
     };
 

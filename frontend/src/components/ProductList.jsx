@@ -171,7 +171,7 @@ function ProductList() {
       )}
 
       {!loading && !isActiveFilter && products.length > 0 && (
-        <div className="-mx-3 sm:-mx-6 mb-2 h-40 sm:h-52 rounded-2xl overflow-hidden">
+        <div className="-mx-1 sm:-mx-2 mb-2 h-40 sm:h-52 rounded-2xl overflow-hidden">
           <HeroBanner fallbackProduct={products[0]} />
         </div>
       )}
