@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { getEffectivePrice, isDiscountActive } from '../utils/discount';
 
 function Cart() {
   const { cartItems, removeFromCart } = useCart();
 
   const totalPrice = cartItems.reduce(
-    (sum, item) => sum + item.product_detail.price * item.quantity,
+    (sum, item) => sum + getEffectivePrice(item.product_detail) * item.quantity,
     0
   );
 
@@ -44,7 +45,18 @@ function Cart() {
               )}
               <div className="flex-1">
                 <h3 className="font-semibold text-gray-800">{product.name}</h3>
-                <p className="text-pink-600 font-bold">₹{product.price}</p>
+                {isDiscountActive(product) ? (
+                  <div className="flex items-center gap-2">
+                    <p className="text-pink-600 font-bold">
+                      ₹{Number(product.discount_price).toFixed(2)}
+                    </p>
+                    <p className="text-sm text-gray-400 line-through">
+                      ₹{Number(product.price).toFixed(2)}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-pink-600 font-bold">₹{Number(product.price).toFixed(2)}</p>
+                )}
                 <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
               </div>
               <button
