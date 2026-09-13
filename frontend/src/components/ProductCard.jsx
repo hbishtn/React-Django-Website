@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
 import PriceDisplay from './PriceDisplay';
+import { useWishlist } from '../context/WishlistContext';
 
 function ProductCard({ product }) {
-  const [wishlisted, setWishlisted] = useState(false);
+  const { isWishlisted, toggleWishlist } = useWishlist();
+  const wishlisted = isWishlisted(product.id);
   const primaryImage = product.images.find((img) => img.is_primary) || product.images[0];
 
   const isNew =
@@ -15,7 +16,7 @@ function ProductCard({ product }) {
       <button
         onClick={(e) => {
           e.preventDefault();
-          setWishlisted(!wishlisted);
+          toggleWishlist(product);
         }}
         className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white/95 flex items-center justify-center shadow-sm"
       >

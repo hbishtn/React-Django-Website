@@ -17,6 +17,8 @@ import AdminRoute from './components/AdminRoute';
 import EditProduct from './components/EditProduct';
 import LoginPromptModal from './components/LoginPromptModal';
 import FeaturedProductsManager from './components/FeaturedProductsManager';
+import Orders from './components/Orders';
+import Wishlist from './components/Wishlist';
 
 function App() {
   return (
@@ -38,6 +40,15 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/orders"
+          element={
+            <ProtectedRoute>
+              <Orders />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/wishlist" element={<Wishlist />} />
         <Route
           path="/x7k9-quick-add"
           element={
