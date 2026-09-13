@@ -13,12 +13,11 @@ import AnnouncementBar from './components/AnnouncementBar';
 import NailPaintPicker from './components/NailPaintPicker';
 import BottomNav from './components/BottomNav';
 import QuickAddProduct from './components/QuickAddProduct';
+import ManageUsers from './components/ManageUsers';
 import AdminRoute from './components/AdminRoute';
 import EditProduct from './components/EditProduct';
 import LoginPromptModal from './components/LoginPromptModal';
 import FeaturedProductsManager from './components/FeaturedProductsManager';
-import Orders from './components/Orders';
-import Wishlist from './components/Wishlist';
 
 function App() {
   return (
@@ -41,19 +40,18 @@ function App() {
           }
         />
         <Route
-          path="/orders"
-          element={
-            <ProtectedRoute>
-              <Orders />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/wishlist" element={<Wishlist />} />
-        <Route
           path="/x7k9-quick-add"
           element={
             <AdminRoute>
               <QuickAddProduct />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/x7k9-manage-users"
+          element={
+            <AdminRoute>
+              <ManageUsers />
             </AdminRoute>
           }
         />

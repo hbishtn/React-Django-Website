@@ -152,6 +152,30 @@ def health_check(request):
     return Response({'status': 'ok', 'products': product_count})
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def manage_users(request):
+    if not request.user.is_staff:
+        return Response({'error': 'Not authorized'}, status=403)
+
+    users = User.objects.all().order_by('-date_joined')
+    user_list = [
+        {
+            'id': u.id,
+            'username': u.username,
+            'email': u.email,
+            'date_joined': u.date_joined,
+            'is_staff': u.is_staff,
+        }
+        for u in users
+    ]
+
+    return Response({
+        'total_users': users.count(),
+        'users': user_list,
+    })
+
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register_view(request):
@@ -210,23 +234,6 @@ def add_to_cart(request):
         cart_item.quantity += 1
         cart_item.save()
 
-    serializer = CartSerializer(cart)
-    return Response(serializer.data)
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def decrease_cart_item(request, item_id):
-    cart_item = CartItem.objects.filter(id=item_id, cart__user=request.user).first()
-
-    if cart_item:
-        if cart_item.quantity > 1:
-            cart_item.quantity -= 1
-            cart_item.save()
-        else:
-            cart_item.delete()
-
-    cart = Cart.objects.get(user=request.user)
     serializer = CartSerializer(cart)
     return Response(serializer.data)
 

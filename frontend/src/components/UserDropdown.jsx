@@ -42,29 +42,14 @@ function UserDropdown() {
               My Profile
             </button>
 
-            <Link
-              to="/orders"
-              onClick={() => setIsOpen(false)}
-              className="w-full text-left px-4 py-2.5 text-sm text-[#282C3F] hover:bg-[#F5F5F6] flex items-center gap-2"
-            >
+            <button className="w-full text-left px-4 py-2.5 text-sm text-[#282C3F] hover:bg-[#F5F5F6] flex items-center gap-2">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <path d="M20 12V8H6a2 2 0 010-4h12v4"></path>
                 <path d="M4 6v12a2 2 0 002 2h14v-4"></path>
                 <path d="M18 12a2 2 0 000 4h4v-4z"></path>
               </svg>
               My Orders
-            </Link>
-
-            <Link
-              to="/wishlist"
-              onClick={() => setIsOpen(false)}
-              className="w-full text-left px-4 py-2.5 text-sm text-[#282C3F] hover:bg-[#F5F5F6] flex items-center gap-2"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 10-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z" />
-              </svg>
-              My Wishlist
-            </Link>
+            </button>
 
             {isStaff && (
               <Link
@@ -77,6 +62,22 @@ function UserDropdown() {
                   <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
                 Add Product
+              </Link>
+            )}
+
+            {isStaff && (
+              <Link
+                to="/x7k9-manage-users"
+                onClick={() => setIsOpen(false)}
+                className="w-full text-left px-4 py-2.5 text-sm text-[#282C3F] hover:bg-[#F5F5F6] flex items-center gap-2"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 00-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 010 7.75"></path>
+                </svg>
+                Manage Users
               </Link>
             )}
           </div>
