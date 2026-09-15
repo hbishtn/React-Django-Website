@@ -74,7 +74,7 @@ function HomeSuggestions({ products }) {
             <h2 className="text-lg font-black text-[#282C3F]">Discount Offers For You</h2>
           </div>
 
-          <div className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-1 mb-8 [overscroll-behavior-x:contain]">
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-1 mb-8">
             {offerRow.map((product) => (
               <OfferTile key={product.id} product={product} />
             ))}
