@@ -42,14 +42,29 @@ function UserDropdown() {
               My Profile
             </button>
 
-            <button className="w-full text-left px-4 py-2.5 text-sm text-[#282C3F] hover:bg-[#F5F5F6] flex items-center gap-2">
+            <Link
+              to="/orders"
+              onClick={() => setIsOpen(false)}
+              className="w-full text-left px-4 py-2.5 text-sm text-[#282C3F] hover:bg-[#F5F5F6] flex items-center gap-2"
+            >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <path d="M20 12V8H6a2 2 0 010-4h12v4"></path>
                 <path d="M4 6v12a2 2 0 002 2h14v-4"></path>
                 <path d="M18 12a2 2 0 000 4h4v-4z"></path>
               </svg>
               My Orders
-            </button>
+            </Link>
+
+            <Link
+              to="/wishlist"
+              onClick={() => setIsOpen(false)}
+              className="w-full text-left px-4 py-2.5 text-sm text-[#282C3F] hover:bg-[#F5F5F6] flex items-center gap-2"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 10-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z" />
+              </svg>
+              My Wishlist
+            </Link>
 
             {isStaff && (
               <Link
