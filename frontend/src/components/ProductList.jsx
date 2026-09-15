@@ -163,7 +163,7 @@ function ProductList() {
   });
 
   return (
-    <div className="min-h-screen bg-[#F5F5F6] px-3 py-4 sm:px-6 sm:py-6">
+    <div className="min-h-screen bg-[#F5F5F6] px-1.5 py-4 sm:px-4 sm:py-6">
       {searchQuery && (
         <p className="text-center text-[#7E818C] mb-4">
           Showing results for "<span className="font-semibold text-[#282C3F]">{searchQuery}</span>"
@@ -176,7 +176,7 @@ function ProductList() {
         </div>
       )}
 
-      <div className="sticky top-0 z-30 bg-[#F5F5F6] pt-2 pb-2 -mx-3 sm:-mx-6 px-3">
+      <div className="sticky top-0 z-30 bg-[#F5F5F6] pt-2 pb-2 -mx-1.5 sm:-mx-4 px-1.5">
         <CategoryTiles
           categories={sortedCategories}
           selectedCategory={selectedCategory}

@@ -80,7 +80,7 @@ function CategoryTiles({ categories, selectedCategory, onSelect, t }) {
 
   return (
     <div className="max-w-6xl mx-auto mb-0.1">
-      <div className="flex gap-5 overflow-x-auto pt-1.5 pb-2 px-2 scrollbar-hide [overflow-clip-margin:20px]">
+      <div className="flex gap-5 overflow-x-auto pt-1.5 pb-2 px-2 scrollbar-hide [overflow-clip-margin:20px] [overscroll-behavior-x:contain]">
         <button
           onClick={() => onSelect(null)}
           className="flex flex-col items-center gap-2 shrink-0"
