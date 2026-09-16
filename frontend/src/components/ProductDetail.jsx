@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import RelatedProductCard from './RelatedProductCard';
@@ -19,6 +19,18 @@ function ProductDetail() {
   const [colorVariants, setColorVariants] = useState([]);
   const [added, setAdded] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleBack = () => {
+    // Agar is tab mein pehle se koi in-app history hai (jaise category-filtered
+    // home se yahan aaye the), usi pe wapas jao taaki category selection bani rahe.
+    // Warna (direct link/share se khola tha) seedha home pe le jao.
+    if (location.key !== 'default') {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -98,9 +110,9 @@ function ProductDetail() {
     <div className="min-h-screen bg-white">
       <div className="border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-2 text-sm overflow-hidden">
-          <Link to="/" className="text-[#7E818C] hover:text-[#FF3F6C] transition-colors shrink-0">
+          <button onClick={handleBack} className="text-[#7E818C] hover:text-[#FF3F6C] transition-colors shrink-0">
             Home
-          </Link>
+          </button>
           <span className="text-gray-300 shrink-0">/</span>
           <span className="text-[#282C3F] font-medium truncate">{product.name}</span>
         </div>
