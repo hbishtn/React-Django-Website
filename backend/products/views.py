@@ -20,6 +20,8 @@ from django.contrib.auth.models import User
 import base64
 from django.core.files.base import ContentFile
 from django.utils.text import slugify
+from django.utils import timezone
+from datetime import timedelta
 import requests as http_requests
 
 
@@ -174,6 +176,8 @@ def manage_users(request):
         return Response({'error': 'Not authorized'}, status=403)
 
     users = User.objects.all().order_by('-date_joined')
+    week_ago = timezone.now() - timedelta(days=7)
+
     user_list = [
         {
             'id': u.id,
@@ -187,8 +191,30 @@ def manage_users(request):
 
     return Response({
         'total_users': users.count(),
+        'admin_count': users.filter(is_staff=True).count(),
+        'new_this_week': users.filter(date_joined__gte=week_ago).count(),
         'users': user_list,
     })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def toggle_user_staff(request, user_id):
+    if not request.user.is_staff:
+        return Response({'error': 'Not authorized'}, status=403)
+
+    if request.user.id == user_id:
+        return Response({'error': 'Aap khud ka admin status change nahi kar sakte'}, status=400)
+
+    try:
+        target_user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=404)
+
+    target_user.is_staff = not target_user.is_staff
+    target_user.save(update_fields=['is_staff'])
+
+    return Response({'id': target_user.id, 'is_staff': target_user.is_staff})
 
 
 @api_view(['POST'])
