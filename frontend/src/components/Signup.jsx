@@ -5,7 +5,7 @@ import { useCart } from '../context/CartContext';   // naya import
 import { GoogleLogin } from '@react-oauth/google';
 
 function Signup() {
-  const [username, setUsername] = useState('');
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -20,7 +20,7 @@ function Signup() {
     fetch(`${import.meta.env.VITE_API_URL}/register/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, email, password }),
+      body: JSON.stringify({ name, email, password }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -29,7 +29,7 @@ function Signup() {
           login(data.token, data.username, data.is_staff);
           navigate('/');
         } else {
-          setError('Signup failed. Try a different username.');
+          setError(data.email?.[0] || data.name?.[0] || 'Signup failed. Try again.');
         }
       });
   };
@@ -64,9 +64,9 @@ function Signup() {
 
         <input
           type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Full Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-4"
           required
         />

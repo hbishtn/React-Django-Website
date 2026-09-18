@@ -163,3 +163,19 @@ STORAGES = {
     },
 }
 
+# Email (password reset ke liye) — agar EMAIL_HOST_USER set nahi hai to
+# emails sirf console/logs mein print hongi (dev ke liye theek hai), asli
+# bhejne ke liye Render environment variables mein EMAIL_HOST_USER aur
+# EMAIL_HOST_PASSWORD (Gmail App Password) set karna hoga.
+EMAIL_BACKEND = config(
+    'EMAIL_BACKEND',
+    default='django.core.mail.backends.console.EmailBackend'
+)
+EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@bishtcosmetic.com')
+FRONTEND_URL = config('FRONTEND_URL', default='https://bishtcosmetic.vercel.app')
+

@@ -17,6 +17,11 @@ from .models import Product, Review
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from django.contrib.auth.models import User
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.core.mail import send_mail
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.conf import settings
 import base64
 from django.core.files.base import ContentFile
 from django.utils.text import slugify
@@ -231,14 +236,88 @@ def register_view(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_view(request):
-    username = request.data.get('username')
+    email = request.data.get('email')
     password = request.data.get('password')
-    user = authenticate(username=username, password=password)
+
+    if not email or not password:
+        return Response({'error': 'Email aur password dono chahiye'}, status=400)
+
+    try:
+        user_obj = User.objects.get(email__iexact=email)
+    except User.DoesNotExist:
+        return Response({'error': 'Invalid credentials'}, status=400)
+
+    user = authenticate(username=user_obj.username, password=password)
 
     if user:
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, 'username': user.username, 'is_staff': user.is_staff})
     return Response({'error': 'Invalid credentials'}, status=400)
+
+
+password_reset_token = PasswordResetTokenGenerator()
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def request_password_reset(request):
+    email = request.data.get('email')
+    if not email:
+        return Response({'error': 'Email chahiye'}, status=400)
+
+    generic_message = {'message': 'Agar ye email registered hai, to reset link bhej diya gaya hai.'}
+
+    try:
+        user = User.objects.get(email__iexact=email)
+    except User.DoesNotExist:
+        # Security ke liye hamesha same message — taaki koi ye pata na
+        # laga sake ki kaunsa email registered hai
+        return Response(generic_message)
+
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = password_reset_token.make_token(user)
+    reset_link = f"{settings.FRONTEND_URL}/reset-password/{uid}/{token}/"
+
+    send_mail(
+        subject='Bisht Cosmetic — Password Reset',
+        message=(
+            f"Apna password reset karne ke liye ye link kholo:\n\n{reset_link}\n\n"
+            "Agar aapne ye request nahi ki thi, to is email ko ignore kar dein."
+        ),
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[email],
+        fail_silently=True,
+    )
+
+    return Response(generic_message)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def confirm_password_reset(request):
+    uid = request.data.get('uid')
+    token = request.data.get('token')
+    new_password = request.data.get('new_password')
+
+    if not uid or not token or not new_password:
+        return Response({'error': 'Sab fields chahiye'}, status=400)
+
+    if len(new_password) < 6:
+        return Response({'error': 'Password kam se kam 6 characters ka hona chahiye'}, status=400)
+
+    try:
+        user_id = force_str(urlsafe_base64_decode(uid))
+        user = User.objects.get(pk=user_id)
+    except (User.DoesNotExist, ValueError, TypeError, OverflowError):
+        return Response({'error': 'Ye link invalid ya expire ho chuki hai'}, status=400)
+
+    if not password_reset_token.check_token(user, token):
+        return Response({'error': 'Ye link invalid ya expire ho chuki hai'}, status=400)
+
+    user.set_password(new_password)
+    user.save()
+
+    return Response({'message': 'Password reset ho gaya! Ab login kar sakte ho.'})
 
 
 class OrderViewSet(viewsets.ModelViewSet):

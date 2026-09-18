@@ -1,6 +1,22 @@
+import re
+import random
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import Category, Product, ProductImage, Order, OrderItem, Cart, CartItem, Review
+
+
+def generate_unique_username(email, name=''):
+    """Real site jaisa username generate karta hai — email ke pehle hisse se,
+    aur agar wo already liya hua hai to ek random number jod deta hai
+    (jaise Instagram/Gmail karte hain)."""
+    base = re.sub(r'[^a-zA-Z0-9]', '', email.split('@')[0]).lower()
+    if not base:
+        base = re.sub(r'[^a-zA-Z0-9]', '', name).lower() or 'user'
+
+    username = base
+    while User.objects.filter(username=username).exists():
+        username = f"{base}{random.randint(100, 9999)}"
+    return username
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -54,17 +70,33 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'slug', 'image']
 
 class RegisterSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(write_only=True, required=True)
     password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
+        fields = ['name', 'email', 'password']
+
+    def validate_email(self, value):
+        if User.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError("Is email se pehle se account bana hua hai.")
+        return value
 
     def create(self, validated_data):
+        name = validated_data.get('name', '').strip()
+        email = validated_data['email']
+        username = generate_unique_username(email, name)
+
+        name_parts = name.split(' ', 1)
+        first_name = name_parts[0] if name_parts else ''
+        last_name = name_parts[1] if len(name_parts) > 1 else ''
+
         user = User.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data.get('email', ''),
-            password=validated_data['password']
+            username=username,
+            email=email,
+            password=validated_data['password'],
+            first_name=first_name,
+            last_name=last_name,
         )
         return user
 

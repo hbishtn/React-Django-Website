@@ -5,7 +5,7 @@ import { useCart } from '../context/CartContext';   // naya import
 import { GoogleLogin } from '@react-oauth/google';
 
 function Login() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { login } = useAuth();
@@ -19,7 +19,7 @@ function Login() {
     fetch(`${import.meta.env.VITE_API_URL}/login/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ email, password }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -28,7 +28,7 @@ function Login() {
           login(data.token, data.username, data.is_staff);
           navigate('/');
         } else {
-          setError('Invalid username or password.');
+          setError('Invalid email or password.');
         }
       });
   };
@@ -62,10 +62,10 @@ function Login() {
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
         <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-4"
           required
         />
@@ -74,9 +74,14 @@ function Login() {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-4"
+          className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-1"
           required
         />
+        <div className="text-right mb-4">
+          <Link to="/forgot-password" className="text-xs text-pink-600 hover:underline">
+            Forgot password?
+          </Link>
+        </div>
 
         <button
           type="submit"

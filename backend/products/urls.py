@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import CategoryViewSet, ProductViewSet, register_view, login_view, OrderViewSet, get_cart, add_to_cart, remove_from_cart, clear_cart_view, chat_view, add_review, analyze_product_image
-from .views import google_login_view, quick_add_product, create_category, remove_background, edit_product, delete_product, featured_products, set_featured_products, health_check, match_product_image, update_category_image, manage_users, toggle_user_staff
+from .views import google_login_view, quick_add_product, create_category, remove_background, edit_product, delete_product, featured_products, set_featured_products, health_check, match_product_image, update_category_image, manage_users, toggle_user_staff, request_password_reset, confirm_password_reset
 
 router = DefaultRouter()
 router.register('categories', CategoryViewSet)
@@ -15,6 +15,8 @@ urlpatterns = [
     path('', include(router.urls)),
     path('login/', login_view, name='login'),
     path('register/', register_view, name='register'),
+    path('password-reset/', request_password_reset, name='request_password_reset'),
+    path('password-reset-confirm/', confirm_password_reset, name='confirm_password_reset'),
     path('cart/', get_cart, name='get_cart'),
     path('cart/add/', add_to_cart, name='add_to_cart'),
     path('cart/remove/<int:item_id>/', remove_from_cart, name='remove_from_cart'),
