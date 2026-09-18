@@ -1,22 +1,22 @@
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import PriceDisplay from './PriceDisplay';
-import { useWishlist } from '../context/WishlistContext';
 
 function ProductCard({ product }) {
-  const { isWishlisted, toggleWishlist } = useWishlist();
-  const wishlisted = isWishlisted(product.id);
+  const [wishlisted, setWishlisted] = useState(false);
   const primaryImage = product.images.find((img) => img.is_primary) || product.images[0];
 
   const isNew =
     (new Date() - new Date(product.created_at)) / (1000 * 60 * 60 * 24) <= 7;
   const lowStock = product.stock > 0 && product.stock <= 5;
+  const outOfStock = product.stock === 0;
 
   return (
     <div className="group relative bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow duration-300">
       <button
         onClick={(e) => {
           e.preventDefault();
-          toggleWishlist(product);
+          setWishlisted(!wishlisted);
         }}
         className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white/95 flex items-center justify-center shadow-sm"
       >
@@ -39,8 +39,16 @@ function ProductCard({ product }) {
               src={primaryImage.image}
               alt={product.name}
               loading="lazy"
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${outOfStock ? 'opacity-50 grayscale' : ''}`}
             />
+          )}
+
+          {outOfStock && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="bg-white text-red-600 text-[11px] font-bold uppercase tracking-wide px-3 py-1 rounded-full border border-red-200 shadow-sm">
+                Out of stock
+              </span>
+            </div>
           )}
 
           {isNew && (
@@ -72,10 +80,16 @@ function ProductCard({ product }) {
             />
           </div>
 
-          {lowStock && (
-            <p className="text-[#FF9F00] text-[11px] font-semibold mt-1">
-              Only {product.stock} left!
+          {outOfStock ? (
+            <p className="text-red-600 text-[11px] font-semibold mt-1">
+              Out of stock
             </p>
+          ) : (
+            lowStock && (
+              <p className="text-[#FF9F00] text-[11px] font-semibold mt-1">
+                Only {product.stock} left!
+              </p>
+            )
           )}
         </div>
       </Link>
