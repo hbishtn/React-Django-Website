@@ -31,7 +31,10 @@ class Product(models.Model):
     discount_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     discount_ends_at = models.DateTimeField(null=True, blank=True)
     image_hash = models.CharField(max_length=16, blank=True, null=True, db_index=True)
-
+    # For Semantic search  — naam+description's "meaning fingerprint"
+    # (Through Gemini embedding API), JSON list of numbers forms
+    embedding = models.TextField(blank=True, null=True)
+    
     def __str__(self):
         return self.name
 

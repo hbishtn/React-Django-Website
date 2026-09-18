@@ -8,6 +8,7 @@ from django.contrib.auth import authenticate
 from django.db.models import Q
 from .models import Category, Product, Order, Cart, CartItem, ProductImage
 from .image_hash import compute_image_hash, hash_distance
+from .embeddings import save_product_embedding
 from .serializers import CategorySerializer, ProductListSerializer, ProductDetailSerializer, RegisterSerializer, OrderSerializer, CartSerializer, ReviewSerializer
 from rest_framework.permissions import IsAuthenticated
 from groq import Groq
@@ -138,7 +139,21 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
 
         search_param = self.request.query_params.get('search')
         if search_param:
-            queryset = queryset.filter(name__icontains=search_param)
+            from .embeddings import get_embedding, cosine_similarity
+            import json
+
+            query_vector = get_embedding(search_param)
+            if query_vector:
+                scored = []
+                for p in queryset:
+                    if p.embedding:
+                        sim = cosine_similarity(query_vector, json.loads(p.embedding))
+                        if sim > 0.5:
+                            scored.append((sim, p))
+                scored.sort(key=lambda x: -x[0])
+                queryset = [p for _, p in scored]
+            else:
+                queryset = queryset.filter(name__icontains=search_param)
 
         return queryset
 
@@ -408,6 +423,7 @@ def quick_add_product(request):
         stock=stock,
         category=category,
     )
+    save_product_embedding(product)
 
     if image_file:
         try:
@@ -532,6 +548,8 @@ def edit_product(request, product_id):
             product.discount_ends_at = discount_ends_at
 
     product.save()
+    if name or description:
+        save_product_embedding(product)
 
     # Agar product ki abhi koi image hi nahi hai, to sabse pehli naye upload ko
     # hi primary bana do — taaki product listing/cards mein turant dikhe.
