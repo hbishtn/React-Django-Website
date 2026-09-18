@@ -107,3 +107,22 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.product.name} ({self.rating}★)"
+
+FRAME_CHOICES = [
+    ('none', 'No Frame'),
+    ('classic', 'Classic Pink'),
+    ('teal_ring', 'Teal Ring'),
+    ('gold_elite', 'Gold Elite'),
+    ('neon_glow', 'Neon Glow'),
+    ('royal_diamond', 'Royal Diamond'),
+]
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+    avatar_frame = models.CharField(max_length=20, choices=FRAME_CHOICES, default='none')
+    phone = models.CharField(max_length=15, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Profile - {self.user.username}"

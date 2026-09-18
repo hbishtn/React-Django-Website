@@ -2,7 +2,7 @@ import re
 import random
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Category, Product, ProductImage, Order, OrderItem, Cart, CartItem, Review
+from .models import Category, Product, ProductImage, Order, OrderItem, Cart, CartItem, Review, UserProfile
 
 
 def generate_unique_username(email, name=''):
@@ -142,3 +142,16 @@ class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = ['id', 'items']
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username', read_only=True)
+    email = serializers.EmailField(source='user.email', read_only=True)
+    date_joined = serializers.DateTimeField(source='user.date_joined', read_only=True)
+    is_staff = serializers.BooleanField(source='user.is_staff', read_only=True)
+
+    class Meta:
+        model = UserProfile
+        fields = [
+            'username', 'email', 'date_joined', 'is_staff',
+            'profile_picture', 'avatar_frame', 'phone',
+        ]

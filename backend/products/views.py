@@ -6,10 +6,11 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from django.db.models import Q
-from .models import Category, Product, Order, Cart, CartItem, ProductImage
+from .models import Category, Product, Order, Cart, CartItem, ProductImage, UserProfile
 from .image_hash import compute_image_hash, hash_distance
 from .embeddings import save_product_embedding
-from .serializers import CategorySerializer, ProductListSerializer, ProductDetailSerializer, RegisterSerializer, OrderSerializer, CartSerializer, ReviewSerializer
+from .serializers import CategorySerializer, ProductListSerializer, ProductDetailSerializer, RegisterSerializer, OrderSerializer, CartSerializer, ReviewSerializer, UserProfileSerializer
+from django.contrib.auth.hashers import check_password
 from rest_framework.permissions import IsAuthenticated
 from groq import Groq
 from decouple import config
@@ -172,6 +173,76 @@ def health_check(request):
     # dono active/warm rahein, na ki sirf backend jaage aur DB phir bhi so raha ho
     product_count = Product.objects.count()
     return Response({'status': 'ok', 'products': product_count})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_profile(request):
+    from django.db.models import Sum
+
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    serializer = UserProfileSerializer(profile, context={'request': request})
+
+    order_stats = Order.objects.filter(user=request.user).aggregate(total_spent=Sum('total_price'))
+    order_count = Order.objects.filter(user=request.user).count()
+
+    data = serializer.data
+    data['order_count'] = order_count
+    data['total_spent'] = str(order_stats['total_spent'] or 0)
+    return Response(data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_profile(request):
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    user = request.user
+
+    if 'profile_picture' in request.FILES:
+        profile.profile_picture = request.FILES['profile_picture']
+
+    avatar_frame = request.data.get('avatar_frame')
+    if avatar_frame is not None:
+        valid_frames = dict(UserProfile._meta.get_field('avatar_frame').choices)
+        if avatar_frame not in valid_frames:
+            return Response({'error': 'Invalid frame'}, status=400)
+        profile.avatar_frame = avatar_frame
+
+    phone = request.data.get('phone')
+    if phone is not None:
+        profile.phone = phone
+
+    email = request.data.get('email')
+    if email is not None and email != user.email:
+        if User.objects.exclude(id=user.id).filter(email=email).exists():
+            return Response({'error': 'Ye email pehle se kisi aur account se juda hai'}, status=400)
+        user.email = email
+        user.save()
+
+    profile.save()
+
+    serializer = UserProfileSerializer(profile, context={'request': request})
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def change_password(request):
+    old_password = request.data.get('old_password', '')
+    new_password = request.data.get('new_password', '')
+
+    if not old_password or not new_password:
+        return Response({'error': 'Dono password fields zaroori hain'}, status=400)
+
+    if len(new_password) < 6:
+        return Response({'error': 'Naya password kam se kam 6 characters ka hona chahiye'}, status=400)
+
+    if not check_password(old_password, request.user.password):
+        return Response({'error': 'Current password galat hai'}, status=400)
+
+    request.user.set_password(new_password)
+    request.user.save()
+    return Response({'success': True})
 
 
 @api_view(['GET'])

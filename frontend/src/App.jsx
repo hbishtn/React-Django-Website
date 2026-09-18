@@ -22,6 +22,7 @@ import LoginPromptModal from './components/LoginPromptModal';
 import FeaturedProductsManager from './components/FeaturedProductsManager';
 import Orders from './components/Orders';
 import Wishlist from './components/Wishlist';
+import Profile from './components/Profile';
 
 function App() {
   return (
@@ -54,6 +55,14 @@ function App() {
           }
         />
         <Route path="/wishlist" element={<Wishlist />} />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/x7k9-quick-add"
           element={

@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
+import AvatarFrame from './AvatarFrame';
 
 function UserDropdown() {
-  const { username, logout, isStaff } = useAuth();
+  const { username, logout, isStaff, profilePicture, avatarFrame } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -19,28 +20,32 @@ function UserDropdown() {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-8 h-8 rounded-full bg-[#FF3F6C] flex items-center justify-center text-white text-sm font-bold"
-      >
-        {username.charAt(0).toUpperCase()}
+      <button onClick={() => setIsOpen(!isOpen)} aria-label="Account menu">
+        <AvatarFrame src={profilePicture} username={username} frame={avatarFrame} size={32} />
       </button>
 
       {isOpen && (
         <div className="absolute right-0 top-11 w-56 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
-          <div className="px-4 py-3 border-b border-gray-100">
-            <p className="text-xs text-gray-400">Signed in as</p>
-            <p className="text-sm font-semibold text-[#282C3F] truncate">{username}</p>
+          <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-3">
+            <AvatarFrame src={profilePicture} username={username} frame={avatarFrame} size={36} />
+            <div className="min-w-0">
+              <p className="text-xs text-gray-400">Signed in as</p>
+              <p className="text-sm font-semibold text-[#282C3F] truncate">{username}</p>
+            </div>
           </div>
 
           <div className="py-1">
-            <button className="w-full text-left px-4 py-2.5 text-sm text-[#282C3F] hover:bg-[#F5F5F6] flex items-center gap-2">
+            <Link
+              to="/profile"
+              onClick={() => setIsOpen(false)}
+              className="w-full text-left px-4 py-2.5 text-sm text-[#282C3F] hover:bg-[#F5F5F6] flex items-center gap-2"
+            >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
               My Profile
-            </button>
+            </Link>
 
             <Link
               to="/orders"

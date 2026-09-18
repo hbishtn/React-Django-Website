@@ -2,6 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import CategoryViewSet, ProductViewSet, register_view, login_view, OrderViewSet, get_cart, add_to_cart, remove_from_cart, clear_cart_view, chat_view, add_review, analyze_product_image
 from .views import google_login_view, quick_add_product, create_category, remove_background, edit_product, delete_product, featured_products, set_featured_products, health_check, match_product_image, update_category_image, manage_users, toggle_user_staff, request_password_reset, confirm_password_reset
+from .views import get_profile, update_profile, change_password
 
 router = DefaultRouter()
 router.register('categories', CategoryViewSet)
@@ -34,4 +35,7 @@ urlpatterns = [
     path('products/<int:product_id>/delete/', delete_product, name='delete_product'),
     path('manage-users/', manage_users, name='manage_users'),
     path('manage-users/<int:user_id>/toggle-staff/', toggle_user_staff, name='toggle_user_staff'),
+    path('profile/', get_profile, name='get_profile'),
+    path('profile/update/', update_profile, name='update_profile'),
+    path('profile/change-password/', change_password, name='change_password'),
 ]
