@@ -104,12 +104,18 @@ function CategoryTiles({ categories, selectedCategory, onSelect, t }) {
           className="flex flex-col items-center gap-2 shrink-0"
         >
           <div
-            className={`relative w-16 h-16 rounded-full flex items-center justify-center bg-[#FF3F6C] border-2 ${
-              selectedCategory === null ? 'border-[#282C3F]' : 'border-transparent'
+            className={`relative w-16 h-16 rounded-full flex items-center justify-center transition-all duration-200 ${
+              selectedCategory === null ? 'scale-105' : ''
             }`}
-            style={{ boxShadow: '0 0 9px 0px #FF3F6C40' }}
+            style={{
+              background: 'linear-gradient(145deg, #FF6B93, #E62958)',
+              boxShadow:
+                selectedCategory === null
+                  ? '0 6px 18px rgba(230,41,88,0.45), inset 0 1.5px 3px rgba(255,255,255,0.45), inset 0 -2px 4px rgba(0,0,0,0.15)'
+                  : '0 4px 10px rgba(230,41,88,0.28), inset 0 1.5px 3px rgba(255,255,255,0.35), inset 0 -2px 4px rgba(0,0,0,0.12)',
+            }}
           >
-            <svg className="w-8 h-8 z-10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg className="w-8 h-8 z-10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ filter: 'drop-shadow(0 1px 1.5px rgba(0,0,0,0.2))' }}>
               <path d="M3 11.5L12 4l9 7.5" />
               <path d="M5.5 10v9a1 1 0 001 1h11a1 1 0 001-1v-9" />
               <path d="M9.5 20v-6h5v6" />
