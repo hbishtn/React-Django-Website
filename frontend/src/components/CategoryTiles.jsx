@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+let savedScrollLeft = 0;
 
 function Jhumka({ tilt, side }) {
   const positionClass = side === 'left' ? 'left-1' : 'right-1';
@@ -52,6 +53,19 @@ const GLOW_COLORS = ['#D4AF37', '#C2185B', '#1E88E5', '#2E7D32', '#8E24AA', '#B8
 
 function CategoryTiles({ categories, selectedCategory, onSelect, t }) {
   const [tilt, setTilt] = useState(0);
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollLeft = savedScrollLeft;
+    }
+  }, []);
+
+  const handleScroll = () => {
+    if (scrollRef.current) {
+      savedScrollLeft = scrollRef.current.scrollLeft;
+    }
+  };
 
   useEffect(() => {
     const handleOrientation = (e) => {
@@ -80,7 +94,11 @@ function CategoryTiles({ categories, selectedCategory, onSelect, t }) {
 
   return (
     <div className="max-w-6xl mx-auto mb-0.1">
-      <div className="flex gap-5 overflow-x-auto pt-1.5 pb-2 px-2 scrollbar-hide [overflow-clip-margin:20px]">
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="flex gap-5 overflow-x-auto pt-1.5 pb-2 px-2 scrollbar-hide [overflow-clip-margin:20px]"
+      >
         <button
           onClick={() => onSelect(null)}
           className="flex flex-col items-center gap-2 shrink-0"
