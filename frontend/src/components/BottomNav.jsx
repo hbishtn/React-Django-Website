@@ -2,7 +2,11 @@ import { Link, useLocation } from 'react-router-dom';
 
 function BottomNav() {
   const location = useLocation();
-  const isActive = (path) => location.pathname === path;
+  const categoryParam = new URLSearchParams(location.search).get('category');
+
+  const isHomeActive = location.pathname === '/' && !categoryParam;
+  const isClothActive = categoryParam === 'cloth';
+  const isJewelryActive = categoryParam === 'jewelry';
 
   return (
     <>
@@ -11,7 +15,7 @@ function BottomNav() {
         <Link
           to="/"
           className={`flex flex-col items-center gap-0.5 px-4 py-1 rounded-full transition-colors ${
-            isActive('/') ? 'bg-[#FF3F6C]/10' : ''
+            isHomeActive ? 'bg-[#FF3F6C]/10' : ''
           }`}
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF3F6C" strokeWidth="1.8">
@@ -23,7 +27,9 @@ function BottomNav() {
 
         <Link
           to="/?category=cloth"
-          className="flex flex-col items-center gap-0.5 px-4 py-1 rounded-full transition-colors"
+          className={`flex flex-col items-center gap-0.5 px-4 py-1 rounded-full transition-colors ${
+            isClothActive ? 'bg-[#FF3F6C]/10' : ''
+          }`}
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF3F6C" strokeWidth="1.8">
             <path d="M16 4l4 4-3 3-2-2v11H9V9L7 11l-3-3 4-4 4 2z"></path>
@@ -33,7 +39,9 @@ function BottomNav() {
 
         <Link
           to="/?category=jewelry"
-          className="flex flex-col items-center gap-0.5 px-4 py-1 rounded-full transition-colors"
+          className={`flex flex-col items-center gap-0.5 px-4 py-1 rounded-full transition-colors ${
+            isJewelryActive ? 'bg-[#FF3F6C]/10' : ''
+          }`}
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF3F6C" strokeWidth="1.8">
             <circle cx="12" cy="8" r="5"></circle>

@@ -115,10 +115,9 @@ function CategoryTiles({ categories, selectedCategory, onSelect, t }) {
                   : '0 4px 10px rgba(230,41,88,0.28), inset 0 1.5px 3px rgba(255,255,255,0.35), inset 0 -2px 4px rgba(0,0,0,0.12)',
             }}
           >
-            <svg className="w-8 h-8 z-10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ filter: 'drop-shadow(0 1px 1.5px rgba(0,0,0,0.2))' }}>
-              <path d="M3 11.5L12 4l9 7.5" />
-              <path d="M5.5 10v9a1 1 0 001 1h11a1 1 0 001-1v-9" />
-              <path d="M9.5 20v-6h5v6" />
+            <svg className="w-7 h-7 z-10" viewBox="0 0 24 24" fill="white" style={{ filter: 'drop-shadow(0 1px 1.5px rgba(0,0,0,0.2))' }}>
+              <path d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69z" />
+              <path d="M12 5.432l8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 01-.75-.75v-4.5a.75.75 0 00-.75-.75h-3a.75.75 0 00-.75.75V21a.75.75 0 01-.75.75H5.625a1.875 1.875 0 01-1.875-1.875v-6.198a2.29 2.29 0 00.091-.086L12 5.43z" />
             </svg>
             <ChainArc />
             <Jhumka tilt={tilt} side="left" />
