@@ -46,7 +46,23 @@ function Jhumka({ tilt, side }) {
 }
 
 function ChainArc() {
-  return null;
+  return (
+    <div className="absolute -top-3 left-1/2 -translate-x-1/2 pointer-events-none">
+      <svg width="44" height="20" viewBox="0 0 44 20">
+        {/* Golden Pahadi Nath style arc chain */}
+        <path
+          d="M4 4 Q22 20 40 4"
+          fill="none"
+          stroke="#D4AF37"
+          strokeWidth="1.5"
+        />
+        <circle cx="4" cy="4" r="1.8" fill="#D4AF37" />
+        <circle cx="40" cy="4" r="1.8" fill="#D4AF37" />
+        {/* Center pearl drop */}
+        <circle cx="22" cy="17" r="2.4" fill="#FFFDF5" stroke="#D4AF37" strokeWidth="1" />
+      </svg>
+    </div>
+  );
 }
 // add category colors
 const GLOW_COLORS = ['#D4AF37', '#C2185B', '#1E88E5', '#2E7D32', '#8E24AA', '#B8860B'];
