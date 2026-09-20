@@ -38,7 +38,7 @@ function ManageUsers() {
   const fetchUsers = (searchTerm = '') => {
     setLoading(true);
     const params = searchTerm ? `?search=${encodeURIComponent(searchTerm)}` : '';
-    fetch(`${import.meta.env.VITE_API_URL}/users/${params}`, {
+    fetch(`${import.meta.env.VITE_API_URL}/manage-users/${params}`, {
       headers: { Authorization: `Token ${token}` },
     })
       .then((res) => res.json())
@@ -101,7 +101,7 @@ function ManageUsers() {
     if (!window.confirm(`Are you sure you want to ${action} ${user.username}?`)) return;
 
     setBusyId(user.id);
-    fetch(`${import.meta.env.VITE_API_URL}/users/${user.id}/toggle-staff/`, {
+    fetch(`${import.meta.env.VITE_API_URL}/manage-users/${user.id}/toggle-staff/`, {
       method: 'POST',
       headers: { Authorization: `Token ${token}` },
     })
